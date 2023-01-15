@@ -1,0 +1,94 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Cost {
+  id: Int!
+  month_cost: Int!
+  deposit: Int
+  other_info: String
+}
+
+type House_category {
+  id: Int!
+  name: String!
+  houses: [House]!
+}
+
+type House_img {
+  id: Int!
+  img_url: String!
+  house: House!
+}
+
+type House_location {
+  id: Int!
+  latitude: Float!
+  longitude: Float!
+}
+
+type University {
+  id: Int!
+  name: String!
+  regions: [Region!]!
+}
+
+type Region {
+  id: Int!
+  name: String
+  universities: [University!]!
+  houses: [House]!
+}
+
+type House {
+  id: Int!
+  contact_number: String!
+  gender: Int!
+  min_residence: String!
+  house_other_info: String
+  has_empty: Int!
+  is_crolled: Int!
+  cost: Cost!
+  house_location: House_location!
+  house_category: House_category!
+  region: Region!
+  imgs: [House_img]!
+}
+
+type Main_spot_location {
+  id: Int!
+  latitude: Float!
+  longitude: Float!
+  main_spot: Main_spot!
+}
+
+type Main_spot {
+  id: Int!
+  name: String!
+  main_spot_location: Main_spot_location!
+}
+
+type ImgurlOutput {
+  img_url: String!
+}
+
+type fetchAllHousesOutput {
+  id: Int!
+  contact_number: String!
+  gender: Int!
+  min_residence: String!
+  house_other_info: String
+  has_empty: Int!
+  is_crolled: Int!
+  month_cost: Int!
+  img_urls: [ImgurlOutput!]!
+  nearest_main_spot_name: String!
+}
+
+type Query {
+  fetchMainSpots: [Main_spot!]!
+  fetchAllHouses: [Region!]!
+  fetchHousesByRegion(region_id: Float!): [fetchAllHousesOutput!]!
+  fetchHouse(house_id: Float!): House!
+  fetchImgsByHouse(houseId: Float!): [House_img!]!
+}
