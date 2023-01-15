@@ -17,18 +17,18 @@ import { ConfigModule } from '@nestjs/config';
     }),
     MainSpotModule,
     HouseModule,
-    ImgModule,
+    //ImgModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'src/common/graphql/schema.gql',
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',//
-      port: 3306,//
-      username: 'root',//
-      password: 'shine2358!',//
-      database: 'db_hasuk',//
+      host: process.env.HOST,
+      port: parseInt(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
       entities: [__dirname + '/apis/**/*.entity.*'],
       synchronize: true,
       logging: true,
