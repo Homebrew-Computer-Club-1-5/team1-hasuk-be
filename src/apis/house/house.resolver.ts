@@ -19,7 +19,6 @@ export class HouseResolver{
     fetchHousesByRegion(
         @Args('region_id') region_id: number,
     ){
-        console.log("dsgsgsg");
         return this.houseService.findAllHousesByRegion({region_id});
     }
 

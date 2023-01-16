@@ -14,29 +14,29 @@ export class House{
     @Field(() => Int)
     id : number;
 
-    @Column()
-    @Field(() => String)
+    @Column({nullable : true})
+    @Field(() => String, {nullable:true})
     contact_number : string;
 
-    @Column({type : 'tinyint'})
-    @Field(() => Int)
+    @Column({type : 'tinyint', nullable : true})
+    @Field(() => Int, {nullable : true})
     gender : number;
-
-    @Column()
-    @Field(() => String)
-    min_residence : string;
 
     @Column('text', {nullable : true})
     @Field(()=>String, {nullable : true})
     house_other_info : string;
 
-    @Column({type : 'tinyint'})
-    @Field(() => Int)
+    @Column({type : 'tinyint', nullable : true})
+    @Field(() => Int, {nullable : true})
     has_empty : number;
 
-    @Column({type : 'tinyint'})
-    @Field(() => Int)
+    @Column({type : 'tinyint', nullable : true})
+    @Field(() => Int, {nullable : true})
     is_crolled : number;
+
+    @Column({nullable : true})
+    @Field(()=>Int, {nullable : true})
+    board_date : number;
 
     @OneToOne(() => Cost)
     @JoinColumn({ name : 'cost_id'})
