@@ -90,4 +90,5 @@ type Query {
   fetchAllHouses: [Region!]!
   fetchHousesByRegion(region_id: Float!): [fetchAllHousesOutput!]!
   fetchHouse(house_id: Float!): House!
+  fetchImgsByHouse(houseId: Float!): [House_img!]!
 }

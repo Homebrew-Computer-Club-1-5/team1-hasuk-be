@@ -13,5 +13,6 @@ import { HouseService } from "./house.service";
 @Module({
     imports: [TypeOrmModule.forFeature([House, Main_spot, Region, Cost, House_category, House_img])],
     providers: [HouseResolver,HouseService],
+    
 })
 export class HouseModule{}

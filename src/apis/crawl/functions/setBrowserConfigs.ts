@@ -2,7 +2,7 @@ import * as puppeteer from 'puppeteer';
 
 export async function setBrowserConfigs(){
     //1. 브라우저 켜고
-    const browser = await puppeteer.launch({headless : false,devtools:true,executablePath :'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' })
+    const browser = await puppeteer.launch({headless : false,devtools:true,executablePath : process.env.CRAWL_EXCUTABLE_PATH })
     //2. 새탭 열기
     const page = await browser.newPage();
     //3. 크기조정

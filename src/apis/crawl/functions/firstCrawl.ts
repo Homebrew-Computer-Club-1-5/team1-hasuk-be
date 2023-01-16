@@ -110,6 +110,7 @@ export default async function firstCrawl(page : puppeteer.Page, firstCrawlPeriod
                     contactNumber,
                     homeImgUrls,
                     otherInfo,
+                    house_category_id : 1,
                 }
                 console.log(boardCrawledData.boardId);
                 boardCrawledDatas.push(boardCrawledData);

@@ -129,6 +129,7 @@ export default async function updateCrawl(
         contactNumber,
         homeImgUrls,
         otherInfo,
+        house_category_id : 1,
       };
       console.log('boardId : ', boardCrawledData.boardId);
       boardCrawledDatas.push(boardCrawledData);

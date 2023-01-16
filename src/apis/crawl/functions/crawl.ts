@@ -23,6 +23,7 @@ export interface IBoardCrawledData {
   contactNumber: string;
   homeImgUrls: string[];
   otherInfo: string;
+  house_category_id: number;
 }
 
 export function toTimestamp(dateString: string): number {
