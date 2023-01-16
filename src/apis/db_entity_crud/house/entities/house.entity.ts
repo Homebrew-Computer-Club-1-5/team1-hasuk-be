@@ -34,7 +34,7 @@ export class House{
     @Field(() => Int, {nullable : true})
     is_crolled : number;
 
-    @Column({nullable : true})
+    @Column({type : 'bigint', nullable : true})
     @Field(()=>Int, {nullable : true})
     board_date : number;
 
