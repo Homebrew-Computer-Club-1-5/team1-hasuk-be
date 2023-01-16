@@ -27,11 +27,11 @@ import { CrawlModule } from './apis/crawl/crawl.module';
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost', //
-      port: 3306, //
-      username: 'root', //
-      password: '159rjS497m!', //
-      database: 'myproject04', //
+      host: process.env.HOST,
+      port: parseInt(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
       entities: [__dirname + '/apis/**/*.entity.*'],
       synchronize: true,
       logging: false,

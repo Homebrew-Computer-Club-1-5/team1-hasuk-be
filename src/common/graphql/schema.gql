@@ -42,12 +42,12 @@ type Region {
 
 type House {
   id: Int!
-  contact_number: String!
-  gender: Int!
-  min_residence: String!
+  contact_number: String
+  gender: Int
   house_other_info: String
-  has_empty: Int!
-  is_crolled: Int!
+  has_empty: Int
+  is_crolled: Int
+  board_date: Int
   cost: Cost!
   house_location: House_location!
   house_category: House_category!
@@ -74,12 +74,12 @@ type ImgurlOutput {
 
 type fetchAllHousesOutput {
   id: Int!
-  contact_number: String!
-  gender: Int!
-  min_residence: String!
+  contact_number: String
+  gender: Int
   house_other_info: String
-  has_empty: Int!
-  is_crolled: Int!
+  has_empty: Int
+  is_crolled: Int
+  board_date: Int
   month_cost: Int!
   img_urls: [ImgurlOutput!]!
   nearest_main_spot_name: String!
@@ -90,5 +90,4 @@ type Query {
   fetchAllHouses: [Region!]!
   fetchHousesByRegion(region_id: Float!): [fetchAllHousesOutput!]!
   fetchHouse(house_id: Float!): House!
-  fetchImgsByHouse(houseId: Float!): [House_img!]!
 }
