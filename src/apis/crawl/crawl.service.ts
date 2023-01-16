@@ -23,12 +23,13 @@ export class CrawlService {
 
   async mangeDeprecatedCrawledData() {
     console.log('mangeDeprecatedCrawledData');
-    return 1673748706000;
+    // 아까 말한 작업
+    return;
   }
 
   async updateDB() {
     console.log('크롤링 데이터로 db 업데이트');
-    return true;
+    return;
   }
 
   @Cron(`*/20 * * * * *`, {
@@ -42,8 +43,10 @@ export class CrawlService {
     );
     // 1. deprecated crawled data 관리
     await this.mangeDeprecatedCrawledData();
+
     // 2. latest board date 찾기
     const latestBoardDate = await this.findLatestBoardDate();
+
     // 3. 크롤링 ㄱㄱ
     const result = await crawl(
       {
@@ -54,6 +57,7 @@ export class CrawlService {
       },
       { id: process.env.CRAWL_KOREAPAS_ID, pw: process.env.CRAWL_KOREAPAS_PW },
     );
+
     // 4. DB 업데이트
     await this.updateDB();
     console.log(
