@@ -37,9 +37,10 @@ export interface Iauth {
 
 interface IcrawlConfig {
   crawlPeriod_Day?: number;
+  latestBoardDate?: number;
   isFirstCrawl: boolean;
   contactNumberRegExp: RegExp;
-  latestBoardDate?: number;
+  boardUrl: string;
 }
 
 export async function crawl(
@@ -48,6 +49,7 @@ export async function crawl(
     isFirstCrawl,
     contactNumberRegExp,
     latestBoardDate,
+    boardUrl,
   }: IcrawlConfig,
   { id, pw }: Iauth,
 ): Promise<IBoardCrawledData[]> {
@@ -60,14 +62,8 @@ export async function crawl(
   // 3. 로그인
   await login(page, { id: koreapas_id, pw: koreapas_pw });
 
-  // 2. 복덕방 페이지로 이동
-  await page.goto('https://www.koreapas.com/bbs/zboard.php?id=house');
-  // await page.waitForTimeout(3000)
-
-  // 3. 하숙 탭 선택
-  await page.goto(
-    'https://www.koreapas.com/bbs/zboard.php?category=2&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
-  );
+  // 4. 게시판 페이지로 이동
+  await page.goto(`${boardUrl}`);
 
   // 4. 크롤링 - 최근 crawlTerm 시간동안 올라온 게시물
   let boardCrawledDatas: IBoardCrawledData[] = [];
@@ -84,7 +80,7 @@ export async function crawl(
       contactNumberRegExp,
     );
   }
-  console.log('결과', boardCrawledDatas);
+  console.log('crawledDatas : ', boardCrawledDatas);
 
   // 5. 브라우저 닫기
   await browser.close();
