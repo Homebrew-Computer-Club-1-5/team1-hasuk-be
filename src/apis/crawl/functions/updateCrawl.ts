@@ -16,13 +16,13 @@ export default async function updateCrawl(
   // 2) 크롤링 (크롤링동안 게시물 올라오는건 고려 X, 대신 사람들 안올라오는 시간에 크롤링 ㄱㄱ)
   outer: while (!isOld) {
     inner: for (let i = 0; i < 30; i++) {
-      // console.log('페이지 접속중')
+      console.log('페이지 접속중');
       await page.waitForSelector(
         `#revolution_main_table > tbody > tr:nth-child(${
           2 * i + 3
         }) > td:nth-child(4) > a`,
       );
-      await Promise.all([
+      const response = await Promise.all([
         page.waitForNavigation(),
         page.click(
           `#revolution_main_table > tbody > tr:nth-child(${
@@ -30,7 +30,7 @@ export default async function updateCrawl(
           }) > td:nth-child(4) > a`,
         ),
       ]);
-      // console.log('접속완료')
+      console.log('접속완료');
 
       // 정보들 크롤링 해서 객체에 담기
       // boardDate, boardId
@@ -105,6 +105,11 @@ export default async function updateCrawl(
         '#bonmoon > tbody > tr:nth-child(1) > td > div',
         (element) => element.textContent as string,
       );
+      // let otherInfo = await page.evaluate((selector) => {
+      //   let element = document.querySelector(selector);
+      //   // return Buffer.from(element.textContent, 'utf8').toString();
+      //   return element.textContent.normalize();
+      // }, '#bonmoon > tbody > tr:nth-child(1) > td > div');
 
       // 전화번호 - contactNumber
       const contactNumberMatchResult = otherInfo?.match(contactNumberRegExp);
@@ -129,7 +134,7 @@ export default async function updateCrawl(
         contactNumber,
         homeImgUrls,
         otherInfo,
-        house_category_id : 1,
+        house_category_id: 1,
       };
       console.log('boardId : ', boardCrawledData.boardId);
       boardCrawledDatas.push(boardCrawledData);
