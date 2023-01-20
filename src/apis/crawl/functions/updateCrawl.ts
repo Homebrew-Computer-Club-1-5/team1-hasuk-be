@@ -46,7 +46,9 @@ export default async function updateCrawl(
         'body > div > div:nth-child(7) > div > table:nth-child(13) > tbody > tr > td:nth-child(2) > span:nth-child(4)',
         (element) => element.textContent,
       );
-      if (isRecentText === '하숙 | ') {
+      console.log(isRecentText, 'relcent 텍스트');
+      if ((isRecentText as any).length <= 10) {
+        // innerText가 category_name 일경우
         boardDateSelector++;
         boardIdSelector++;
       }
@@ -72,9 +74,11 @@ export default async function updateCrawl(
         const lastEmptyIndex = boardDate.lastIndexOf(' ');
         boardDate = boardDate.slice(0, boardDate.lastIndexOf(' '));
       }
+      console.log(boardDate, 'aaa');
       // '2023-01-10 12:38:52' 형식으로 정제 완료 후 timestamp 형식으로 전환
       boardDate = toTimestamp(boardDate) as any;
       if (parseInt(boardDate) <= latestBoardDate) {
+        console.log(parseInt(boardDate), '<=', latestBoardDate);
         console.log(
           '================================Crawling Complete================================',
         );
