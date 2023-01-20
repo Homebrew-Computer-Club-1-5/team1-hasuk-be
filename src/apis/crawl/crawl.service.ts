@@ -26,18 +26,8 @@ const boardInfos = [
     url: 'https://www.koreapas.com/bbs/zboard.php?category=4&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
   },
   {
-    board_name: '아파트',
-    house_category_id: 4,
-    url: 'https://www.koreapas.com/bbs/zboard.php?category=5&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
-  },
-  {
-    board_name: '오피스텔',
-    house_category_id: 5,
-    url: 'https://www.koreapas.com/bbs/zboard.php?category=6&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
-  },
-  {
     board_name: '기타',
-    house_category_id: 6,
+    house_category_id: 5,
     url: 'https://www.koreapas.com/bbs/zboard.php?category=7&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
   },
 ];
@@ -165,8 +155,8 @@ export class CrawlService {
   }
 
   // @Cron(`0 0 */1 * * *`, {
-  // @Cron(`0 0 0,3,6,9,12,15,18,21 * * *`, {
-  @Cron(`0 */2 * * * *`, {
+  @Cron(`0 0 0,3,6,9,12,15,18,21 * * *`, {
+    // @Cron(`0 */2 * * * *`, {
     name: 'crawl',
     timeZone: 'Asia/Seoul',
   })
@@ -183,8 +173,10 @@ export class CrawlService {
     for await (const boardInfo of boardInfos) {
       console.log(`${boardInfo.board_name} 게시판 latestBoardDate 조회 `);
       // 1. latestBoardDate DB에서 조회
-      // const latestBoardDate = await this.findLatestBoardDate(); // 여기 인자로 house_category_id 들어가야함
-      const latestBoardDate = 1674117774000;
+      const latestBoardDate = await this.findLatestBoardDate(
+        boardInfo.house_category_id,
+      ); // 여기 인자로 house_category_id 들어가야함
+      // const latestBoardDate = 1674117774000;
       const result = await crawl(
         {
           latestBoardDate,
@@ -198,14 +190,13 @@ export class CrawlService {
         },
       );
       console.log(result);
+      // 4. DB 업데이트
+      await this.updateDB(result, boardInfo.house_category_id);
     }
 
     console.log(
       '====================== Crawl complete ===========================',
     );
-
-    // 4. DB 업데이트
-    // await this.updateDB(result);
   }
 
   // 3번단계 - .map으로 DB UPDATE / INSERT 하면됨
