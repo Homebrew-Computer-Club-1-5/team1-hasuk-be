@@ -166,7 +166,7 @@ export class CrawlService {
 
   // @Cron(`0 0 */1 * * *`, {
   // @Cron(`0 0 0,3,6,9,12,15,18,21 * * *`, {
-  @Cron(`*/50 * * * * *`, {
+  @Cron(`0 */2 * * * *`, {
     name: 'crawl',
     timeZone: 'Asia/Seoul',
   })
@@ -188,16 +188,16 @@ export class CrawlService {
       const result = await crawl(
         {
           latestBoardDate,
-          isFirstCrawl: false,
           contactNumberRegExp: /\d{2,3}(-|\.|\s*)\d{3,4}(-|\.|\s*)\d{3,4}/gm,
           boardUrl: boardInfo.url,
+          house_category_id: boardInfo.house_category_id,
         },
         {
           id: process.env.CRAWL_KOREAPAS_ID,
           pw: process.env.CRAWL_KOREAPAS_PW,
         },
       );
-      console.log('db 업뎃');
+      console.log(result);
     }
 
     console.log(

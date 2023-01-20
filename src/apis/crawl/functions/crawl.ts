@@ -23,20 +23,18 @@ export interface Iauth {
 }
 
 interface IcrawlConfig {
-  crawlPeriod_Day?: number;
   latestBoardDate?: number;
-  isFirstCrawl: boolean;
   contactNumberRegExp: RegExp;
   boardUrl: string;
+  house_category_id: number;
 }
 
 export async function crawl(
   {
-    crawlPeriod_Day,
-    isFirstCrawl,
     contactNumberRegExp,
     latestBoardDate,
     boardUrl,
+    house_category_id,
   }: IcrawlConfig,
   { id, pw }: Iauth,
 ): Promise<IBoardCrawledData[]> {
@@ -55,20 +53,12 @@ export async function crawl(
 
   // 4. 크롤링 - 최근 crawlTerm 시간동안 올라온 게시물
   let boardCrawledDatas: IBoardCrawledData[] = [];
-  if (isFirstCrawl) {
-    boardCrawledDatas = await firstCrawl(
-      page,
-      crawlPeriod_Day,
-      contactNumberRegExp,
-    );
-  } else if (!isFirstCrawl) {
-    boardCrawledDatas = await updateCrawl(
-      page,
-      latestBoardDate,
-      contactNumberRegExp,
-    );
-  }
-  console.log('crawledDatas : ', boardCrawledDatas);
+  boardCrawledDatas = await updateCrawl(
+    page,
+    latestBoardDate,
+    contactNumberRegExp,
+    house_category_id,
+  );
 
   // 5. 브라우저 닫기
   await browser.close();
