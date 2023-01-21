@@ -14,5 +14,7 @@ export class fetchAllHousesOutput extends OmitType(House, ["cost", "house_locati
     @Field(()=>String)
     nearest_main_spot_name : string;
 
+    @Field(()=>String)
+    region_name : string;
     
 }
