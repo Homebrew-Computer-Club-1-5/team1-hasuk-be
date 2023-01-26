@@ -154,7 +154,8 @@ export class CrawlService {
     return;
   }
 
-  // @Cron(`0 0 */1 * * *`, {
+  // @Cron(`*/20 * * * * *`, {
+  // @Cron(`0 */1 * * * * *`, {
   @Cron(`0 0 0,3,6,9,12,15,18,21 * * *`, {
     // @Cron(`0 */2 * * * *`, {
     name: 'crawl',

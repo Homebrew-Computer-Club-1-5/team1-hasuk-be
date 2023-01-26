@@ -9,6 +9,7 @@ import { MainSpotModule } from './apis/mainSpot/mainSpot.module';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CrawlModule } from './apis/crawl/crawl.module';
+import { ImgUploadModule } from './apis/Img_upload/Img.module';
 // import { AppController } from './app.controller';
 // import { AppService } from './app.service';
 
@@ -20,6 +21,7 @@ import { CrawlModule } from './apis/crawl/crawl.module';
     MainSpotModule,
     HouseModule,
     ImgModule,
+    ImgUploadModule,
     CrawlModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,

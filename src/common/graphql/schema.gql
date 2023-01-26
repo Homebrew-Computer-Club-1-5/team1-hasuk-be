@@ -83,6 +83,7 @@ type fetchAllHousesOutput {
   month_cost: Int!
   img_urls: [ImgurlOutput!]!
   nearest_main_spot_name: String!
+  region_name: String!
 }
 
 type Query {
