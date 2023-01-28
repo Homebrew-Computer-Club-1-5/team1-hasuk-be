@@ -1,14 +1,13 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Any } from 'typeorm';
-import { House } from '../../db_entity/house/entities/house.entity';
-import { Region } from '../../db_entity/region/entities/region.entity';
+import { House } from '../db_entity_crud/house/entities/house.entity';
+import { Region } from '../db_entity_crud/region/entities/region.entity';
 import { fetchAllHousesOutput } from './dto/fetchAllHouses.output';
 import { HouseService } from './house.service';
 import { GqlAuthAccessGuard } from 'src/common/auth/gql-auth.guard';
 import { ReqUser } from 'src/common/auth/gql-auth.param';
-import { IreqUser } from './house.type';
-import { CreateHouseInput } from './dto/createHouse/createHouse.input';
+import { IhouseData, IreqUser } from './house.type';
 
 @Resolver()
 export class HouseResolver {
@@ -32,36 +31,18 @@ export class HouseResolver {
     return this.houseService.findHouse({ house_id });
   }
 
-  // @UseGuards(GqlAuthAccessGuard)
-  @Mutation(() => String)
+  @UseGuards(GqlAuthAccessGuard)
+  @Mutation(() => Any)
   async createHouse(
-    @Args('createHouseInput') createHouseInput: CreateHouseInput,
-    // @ReqUser() reqUser: IreqUser,
+    @Args('houseData') houseData: IhouseData,
+    @ReqUser() reqUser: IreqUser,
   ) {
-    // const obj = {
-    //   contact_number: '010-1234-5678',
-    //   university_id: 3,
-    //   region_id: 2,
-    //   house_location: {
-    //     latitude: 1234,
-    //     longitude: 4321,
-    //   },
-    //   month_cost: 30,
-    //   deposit: 500,
-    //   cost_other_info: '공과금 없음',
-    //   gender: '0',
-    //   house_category_id: 1,
-    //   house_other_info: '채광 잘됨.',
-    // };
-    const reqUser = {
-      user_auth_id: 'gunpoll823@gmail.com',
-      name: '김건',
-      auth_method: 1,
-    };
     // 1. 등록!!
-    return await this.houseService.create({
-      createHouseInput,
-      reqUser,
+    this.houseService.create({
+      houseData: houseData,
+      user_auth_id: reqUser.user_auth_id,
     });
+
+    console.log(reqUser);
   }
 }

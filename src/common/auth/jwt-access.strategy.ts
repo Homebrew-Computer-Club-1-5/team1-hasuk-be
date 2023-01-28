@@ -17,7 +17,6 @@ export class JwtAccessStrategy extends PassportStrategy(
     return {
       user_auth_id: payload.user_auth_id,
       name: payload.name,
-      auth_method: payload.auth_method,
     };
   }
 }
