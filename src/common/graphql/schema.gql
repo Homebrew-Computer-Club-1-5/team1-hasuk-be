@@ -93,3 +93,7 @@ type Query {
   fetchHouse(house_id: Float!): House!
   fetchImgsByHouse(houseId: Float!): [House_img!]!
 }
+
+type Mutation {
+  saveImage(img_urls: [String!]!): [String!]!
+}

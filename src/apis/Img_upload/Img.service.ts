@@ -4,31 +4,40 @@ import { Repository } from "typeorm";
 import { House_img } from "../db_entity_crud/house_img/entities/house_img.entity";
 import { HttpService } from '@nestjs/axios';
 import { createWriteStream } from 'fs';
+import { Storage } from "@google-cloud/storage";
+import { resolve } from "path";
 
 
 @Injectable()
-export class ImgService{
+export class ImgUploadService{
     constructor(
         private readonly httpService : HttpService,
-        @InjectRepository(House_img)
-        private readonly house_img_repository : Repository<House_img>,
     ){}
 
-    async findImgByHouse({houseId}){
-        return await this.house_img_repository.find({
-            where: {house : {id : houseId}},
-        });
-    }
 
-    async saveImgAtCloud({img_url}){
-        const response = await this.httpService.axiosRef({
-            url: 'https://docs.nestjs.com/assets/logo-small.svg',
-            method: 'GET',
-            responseType: 'stream',
-          });
-          
-          const writer = createWriteStream('./img_store');
-          response.data.pipe(writer);
-        return 'complete';
+    async saveImgAtCloud({img_urls}){
+        const storage = new Storage({
+            projectId: 'board-373207',
+            keyFilename: 'board-373207-a02f17b5865d.json',
+        }).bucket('hasuk-storage');
+
+        const results = await Promise.all(
+          img_urls.map((el)=>{
+            new Promise(async (resolve, reject) => {
+                const response = await this.httpService.axiosRef({
+                    url : el, 
+                    method: 'GET',
+                    responseType: 'stream',
+                  });
+                  
+                  response.data.pipe(storage.file(el+'.jpg').createWriteStream())
+                  .on('finish', ()=>{resolve(`hasuk-storage/${el}.jpg`)})
+                  .on('error',  ()=>{reject()});
+            });
+          })  
+        );
+
+
+        return results;
     }
 }
