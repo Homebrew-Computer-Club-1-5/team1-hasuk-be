@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { House } from '../db_entity_crud/house/entities/house.entity';
 import { Main_spot } from '../db_entity_crud/main_spot/entities/main_spot.entity';
 import { Region } from '../db_entity_crud/region/entities/region.entity';
+import { User } from '../db_entity_crud/user/entities/user.entity';
 import { Icreate } from './house.type';
 
 @Injectable()
@@ -11,6 +12,9 @@ export class HouseService {
   constructor(
     @InjectRepository(House)
     private readonly house_repository: Repository<House>,
+
+    @InjectRepository(User)
+    private readonly user_repository: Repository<User>,
 
     @InjectRepository(Main_spot)
     private readonly main_spot_repository: Repository<Main_spot>,
@@ -39,5 +43,26 @@ export class HouseService {
     });
   }
 
-  async create({ houseData, user_auth_id }: Icreate) {}
+  async create({ houseData, user_auth_id, auth_method }: Icreate) {
+    console.log(houseData, user_auth_id);
+    console.log(Date.now());
+    // const result = await this.house_repository.save({
+    //   contact_number : houseData.contact_number,
+    //   gender : houseData.gender,
+    //   house_other_info : houseData.house_other_info,
+    //   has_empty : 1,
+    //   is_crolled : 0,
+    //   board_date : Date.now(),
+
+    // })
+    // 2. tb_user에서 id 검색 해오기
+    const user_id = await this.user_repository.findOne({
+      where: { user_auth_id: user_auth_id, auth_method: auth_method },
+    });
+
+    // 3. tb_house_usr에 등록
+
+    // 4. 등록결과 리턴
+    return '하위';
+  }
 }

@@ -91,9 +91,26 @@ type Query {
   fetchAllHouses: [Region!]!
   fetchHousesByRegion(region_id: Float!): [fetchAllHousesOutput!]!
   fetchHouse(house_id: Float!): House!
-  fetchImgsByHouse(houseId: Float!): [House_img!]!
 }
 
 type Mutation {
-  saveImage(img_urls: [String!]!): [String!]!
+  createHouse(houseData: HouseData!): String!
+}
+
+input HouseData {
+  contact_number: String!
+  university_id: Int!
+  region_id: Int!
+  house_location: house_location!
+  month_cost: Int!
+  deposit: Int!
+  cost_other_info: String!
+  gender: Int!
+  house_category_id: Int!
+  house_other_info: String!
+}
+
+input house_location {
+  latitude: Int!
+  longitude: Int!
 }

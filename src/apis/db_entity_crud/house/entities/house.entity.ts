@@ -10,7 +10,7 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { Cost } from '../../cost/entities/cost.entity';
+import { House_cost } from '../../house_cost/entities/house_cost.entity';
 import { House_category } from '../../house_category/entities/house_category.entity';
 import { House_img } from '../../house_img/entities/house_img.entity';
 import { House_location } from '../../house_location/entities/house_location.entity';
@@ -48,10 +48,10 @@ export class House {
   @Field(() => Int, { nullable: true })
   board_date: number;
 
-  @OneToOne(() => Cost)
+  @OneToOne(() => House_cost)
   @JoinColumn({ name: 'cost_id' })
-  @Field(() => Cost)
-  cost: Cost;
+  @Field(() => House_cost)
+  cost: House_cost;
 
   @OneToOne(() => House_location)
   @JoinColumn({ name: 'house_location_id' })
