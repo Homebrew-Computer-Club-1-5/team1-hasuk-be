@@ -2,7 +2,20 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Cost {
+type Main_spot_location {
+  id: Int!
+  latitude: Float!
+  longitude: Float!
+  main_spot: Main_spot!
+}
+
+type Main_spot {
+  id: Int!
+  name: String!
+  main_spot_location: Main_spot_location!
+}
+
+type House_cost {
   id: Int!
   month_cost: Int!
   deposit: Int
@@ -48,24 +61,11 @@ type House {
   has_empty: Int
   is_crolled: Int
   board_date: Int
-  cost: Cost!
+  house_cost: House_cost!
   house_location: House_location!
   house_category: House_category!
   region: Region!
   imgs: [House_img]!
-}
-
-type Main_spot_location {
-  id: Int!
-  latitude: Float!
-  longitude: Float!
-  main_spot: Main_spot!
-}
-
-type Main_spot {
-  id: Int!
-  name: String!
-  main_spot_location: Main_spot_location!
 }
 
 type ImgurlOutput {
@@ -91,9 +91,35 @@ type Query {
   fetchAllHouses: [Region!]!
   fetchHousesByRegion(region_id: Float!): [fetchAllHousesOutput!]!
   fetchHouse(house_id: Float!): House!
-  fetchImgsByHouse(houseId: Float!): [House_img!]!
 }
 
 type Mutation {
-  saveImage(img_urls: [String!]!): [String!]!
+  createHouse(createHouseInput: CreateHouseInput!): String!
+}
+
+input CreateHouseInput {
+  house: HouseInput!
+  house_location: House_locationInput!
+  house_cost: House_costInput!
+  university_id: Int!
+  region_id: Int!
+  house_category_id: Int!
+  imgRawDatas: [String!]!
+}
+
+input HouseInput {
+  contact_number: String
+  gender: Int
+  house_other_info: String
+}
+
+input House_locationInput {
+  latitude: Float!
+  longitude: Float!
+}
+
+input House_costInput {
+  month_cost: Int!
+  deposit: Int
+  other_info: String
 }

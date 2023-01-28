@@ -1,17 +1,15 @@
 import { ApolloDriverConfig } from '@nestjs/apollo';
 import { ApolloDriver } from '@nestjs/apollo/dist/drivers';
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { HouseModule } from './apis/house/house.module';
-// import { ImgModule } from './apis/Img/Img.module';
-import { MainSpotModule } from './apis/mainSpot/mainSpot.module';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { MainSpotModule } from './apis/mainSpot/mainSpot.module';
 import { CrawlModule } from './apis/crawl/crawl.module';
+import { HouseModule } from './apis/house/house.module';
+// import { ImgModule } from './apis/Img/Img.module';
 // import { ImgUploadModule } from './apis/Img_upload/Img.module';
-// import { AppController } from './app.controller';
-// import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -34,7 +32,7 @@ import { CrawlModule } from './apis/crawl/crawl.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [__dirname + '/apis/**/*.entity.*'],
+      entities: [__dirname + '/db_entity/**/*.entity.*'],
       synchronize: true,
       logging: false,
     }),
