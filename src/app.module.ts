@@ -4,7 +4,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HouseModule } from './apis/house/house.module';
-import { ImgModule } from './apis/Img/Img.module';
+// import { ImgModule } from './apis/Img/Img.module';
 import { MainSpotModule } from './apis/mainSpot/mainSpot.module';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -20,8 +20,8 @@ import { ImgUploadModule } from './apis/Img_upload/Img_upload.module';
     }),
     MainSpotModule,
     HouseModule,
-    ImgModule,
-    ImgUploadModule,
+    // ImgModule,
+    // ImgUploadModule,
     CrawlModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,

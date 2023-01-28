@@ -8,3 +8,4 @@ import {HttpModule} from '@nestjs/axios';
     providers: [ImgUploadResolver, ImgUploadService],
 })
 export class ImgUploadModule{}
+

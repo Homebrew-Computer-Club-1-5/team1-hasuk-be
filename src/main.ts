@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ImgModule } from './apis/Img/Img.module';
 import { graphqlUploadExpress } from 'graphql-upload';
 
 async function bootstrap() {
@@ -8,6 +7,11 @@ async function bootstrap() {
   app.enableCors();
   app.use(graphqlUploadExpress());
   console.log(`server listing on ${process.env.PORT}`);        
+
+  console.log('실행중');
+
+  
+          
 
   await app.listen(process.env.PORT);
 }
