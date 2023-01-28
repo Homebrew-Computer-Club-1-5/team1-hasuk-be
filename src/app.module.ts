@@ -5,6 +5,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HouseModule } from './apis/house/house.module';
 // import { ImgModule } from './apis/Img/Img.module';
+// import { ImgModule } from './apis/Img/Img.module';
 import { MainSpotModule } from './apis/mainSpot/mainSpot.module';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';

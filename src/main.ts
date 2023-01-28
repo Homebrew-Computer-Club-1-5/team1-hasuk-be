@@ -10,9 +10,6 @@ async function bootstrap() {
 
   console.log('실행중');
 
-  
-          
-
   await app.listen(process.env.PORT);
 }
 bootstrap();
