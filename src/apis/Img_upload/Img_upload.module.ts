@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
-import {ImgUploadResolver } from "./Img.resolver";
-import {ImgUploadService } from "./Img.service";
+import {ImgUploadResolver } from "./Img_upload.resolver";
+import {ImgUploadService } from "./Img_upload.service";
 import {HttpModule} from '@nestjs/axios';
 
 @Module({
