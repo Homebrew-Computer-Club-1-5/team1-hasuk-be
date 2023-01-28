@@ -5,6 +5,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   OneToMany,
+  JoinTable,
 } from 'typeorm';
 import { House } from '../../house/entities/house.entity';
 
@@ -23,15 +24,16 @@ export class User {
   // @Field(()=>String, {nullable : true})
   name: string;
 
-  @Column({ type: 'tinyint', length: '1' })
+  @Column({ type: 'tinyint' })
   // @Field(()=>String, {nullable : true})
   auth_method: number;
 
-  @ManyToMany(() => University, (universities) => universities.regions)
+  @JoinTable({
+    name: 'tb_house_user',
+    joinColumns: [{ name: 'user_id' }],
+    inverseJoinColumns: [{ name: 'house_id' }],
+  })
+  @ManyToMany(() => House, (house) => house.users)
   // @Field(()=>[University])
-  universities: University[];
-
-  @OneToMany(() => House, (houses) => houses.region)
-  // @Field(()=>[House], {nullable : 'items'})
   houses: House[];
 }

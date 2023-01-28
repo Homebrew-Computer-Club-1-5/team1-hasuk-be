@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { House } from '../db_entity_crud/house/entities/house.entity';
 import { Main_spot } from '../db_entity_crud/main_spot/entities/main_spot.entity';
 import { Region } from '../db_entity_crud/region/entities/region.entity';
+import { Icreate } from './house.type';
 
 @Injectable()
 export class HouseService {
@@ -37,4 +38,6 @@ export class HouseService {
       relations: ['house_location', 'cost', 'house_category', 'region', 'imgs'],
     });
   }
+
+  async create({ houseData, user_auth_id }: Icreate) {}
 }
