@@ -3,6 +3,8 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { crawl } from './functions/crawl';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { HttpService } from '@nestjs/axios';
+import { createWriteStream } from 'fs';
 
 const boardInfos = [
   {
@@ -35,6 +37,7 @@ const boardInfos = [
 @Injectable()
 export class CrawlService {
   constructor(
+    private readonly httpService : HttpService,
     @InjectDataSource()
     private dataSource: DataSource,
   ) {}
@@ -117,10 +120,22 @@ export class CrawlService {
 
           //이미지들 삽입
           for (let j = 0; j < homeImgUrls.length; j++) {
+
+            //db에 이미지url삽입
             this.dataSource.query(
               'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
               [homeImgUrls[j], house_id],
             );
+
+            //클라우드에 이미지 url저장
+            const response = await this.httpService.axiosRef({
+              url : homeImgUrls[j], 
+              method: 'GET',
+              responseType: 'stream',
+            });
+            
+            const writer = createWriteStream('/img_store.jpg');
+            response.data.pipe(writer);
             console.log('homeImgUrls : ' + homeImgUrls[j]);
           }
         }
