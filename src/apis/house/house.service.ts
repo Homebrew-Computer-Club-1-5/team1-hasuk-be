@@ -1,35 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { House } from '../db_entity_crud/house/entities/house.entity';
-import { Main_spot } from '../db_entity_crud/main_spot/entities/main_spot.entity';
-import { Region } from '../db_entity_crud/region/entities/region.entity';
-import { User } from '../db_entity_crud/user/entities/user.entity';
+import { House } from '../../db_entity/house/entities/house.entity';
+import { House_cost } from '../../db_entity/house_cost/entities/house_cost.entity';
+import { House_location } from '../../db_entity/house_location/entities/house_location.entity';
+import { Region } from '../../db_entity/region/entities/region.entity';
+import { User } from '../../db_entity/user/entities/user.entity';
 import { Icreate } from './house.type';
+import { House_img } from '../../db_entity/house_img/entities/house_img.entity';
 
 @Injectable()
 export class HouseService {
   constructor(
     @InjectRepository(House)
-    private readonly house_repository: Repository<House>,
+    private readonly houseRepository: Repository<House>,
 
     @InjectRepository(User)
-    private readonly user_repository: Repository<User>,
-
-    @InjectRepository(Main_spot)
-    private readonly main_spot_repository: Repository<Main_spot>,
+    private readonly userRepository: Repository<User>,
 
     @InjectRepository(Region)
-    private readonly region_repository: Repository<Region>,
+    private readonly regionRepository: Repository<Region>,
+
+    @InjectRepository(House_location)
+    private readonly house_locationRepository: Repository<House_location>,
+
+    @InjectRepository(House_cost)
+    private readonly house_costRepository: Repository<House_cost>,
+
+    @InjectRepository(House_img)
+    private readonly house_imgRepository: Repository<House_img>,
   ) {}
 
   async findAllHouses() {
-    return await this.region_repository.find({
+    return await this.regionRepository.find({
       relations: ['houses', 'houses.house_location'],
     });
   }
   async findAllHousesByRegion({ region_id }) {
-    const builder = this.house_repository.query(
+    const builder = this.houseRepository.query(
       'WITH H AS (SELECT tb_house.*, JSON_ARRAYAGG(JSON_OBJECT("img_url", tb_house_img.img_url)) AS img_urls FROM tb_house, tb_house_img WHERE tb_house.id = tb_house_img.house_id GROUP BY tb_house.id), T AS (SELECT H.*, tb_region.name AS region_name, tb_cost.month_cost, tb_main_spot.name AS nearest_main_spot_name, (POW(tb_main_spot_location.longitude - tb_house_location.longitude, 2) + POW(tb_main_spot_location.latitude - tb_house_location.latitude, 2)) AS mainSpotDistance FROM H, tb_house_location, tb_main_spot_location, tb_main_spot, tb_cost, tb_region WHERE H.region_id = ? AND H.region_id = tb_region.id AND H.house_location_id = tb_house_location.id AND tb_main_spot.main_spot_location_id = tb_main_spot_location.id AND tb_cost.id = H.cost_id) SELECT  T.* from T, (SELECT id, MIN(mainSpotDistance) as nd from T group by T.id) AS T2 WHERE T.mainSpotDistance = T2.nd and T.id = T2.id;',
       [region_id],
     );
@@ -37,32 +45,76 @@ export class HouseService {
   }
 
   async findHouse({ house_id }) {
-    return await this.house_repository.findOne({
+    return await this.houseRepository.findOne({
       where: { id: house_id },
       relations: ['house_location', 'cost', 'house_category', 'region', 'imgs'],
     });
   }
 
-  async create({ houseData, user_auth_id, auth_method }: Icreate) {
-    console.log(houseData, user_auth_id);
-    console.log(Date.now());
-    // const result = await this.house_repository.save({
-    //   contact_number : houseData.contact_number,
-    //   gender : houseData.gender,
-    //   house_other_info : houseData.house_other_info,
-    //   has_empty : 1,
-    //   is_crolled : 0,
-    //   board_date : Date.now(),
+  async create({ createHouseInput, reqUser }: Icreate) {
+    const { user_auth_id, auth_method } = reqUser;
+    const { house, house_location, house_cost, ...rest } = createHouseInput;
+    // 1. 1:1 테이블 등록
+    // 1) tb_house_location 등록
+    const house_locationResult = await this.house_locationRepository.save({
+      ...house_location,
+    });
 
-    // })
-    // 2. tb_user에서 id 검색 해오기
-    const user_id = await this.user_repository.findOne({
+    // 2) tb_house_cost 등록
+    const house_costResult = await this.house_costRepository.save({
+      ...house_cost,
+    });
+
+    // 2. 유저 id 조회
+    const userResult = await this.userRepository.findOne({
       where: { user_auth_id: user_auth_id, auth_method: auth_method },
     });
 
-    // 3. tb_house_usr에 등록
+    // 3. tb_house 등록
+    const houseResult = await this.houseRepository.save({
+      // tb_house
+      ...house,
+      has_empty: 1,
+      is_crolled: 0,
+      board_date: Date.now(),
+
+      // 1:1
+      // tb_house_cost
+      house_cost: house_costResult,
+      // tb_house_location
+      house_location: house_locationResult,
+
+      // 1:N
+      region: {
+        id: rest.region_id,
+      },
+      house_category: {
+        id: rest.house_category_id,
+      },
+
+      // N:M - 유저
+      users: [userResult],
+    });
+
+    // 4. N:1 테이블 등록 - 이미지
+    // 1) imgRawData[] => img_url[] 로 전환
+    const imgRawDatas = rest.imgRawDatas;
+
+    // 2) img_url[] 를 저장
+    const img_urls = ['url1', 'url2', 'url3'];
+    const house_id = houseResult.id;
+    const img_urlsResult = []; // [{id : 1 , img_url : "url1",house_id : 1}]
+    for (let i = 0; i < img_urls.length; i++) {
+      const img_url = img_urls[i];
+      const img_urlResult = await this.house_imgRepository.save({
+        img_url,
+        house: { id: house_id },
+      });
+      img_urlsResult.push(img_urlResult);
+    }
 
     // 4. 등록결과 리턴
-    return '하위';
+    // return { houseResult, img_urlsResult };
+    return '성공';
   }
 }

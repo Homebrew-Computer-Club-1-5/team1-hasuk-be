@@ -51,7 +51,7 @@ export class House {
   @OneToOne(() => House_cost)
   @JoinColumn({ name: 'cost_id' })
   @Field(() => House_cost)
-  cost: House_cost;
+  house_cost: House_cost;
 
   @OneToOne(() => House_location)
   @JoinColumn({ name: 'house_location_id' })

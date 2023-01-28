@@ -1,14 +1,14 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Any } from 'typeorm';
-import { House } from '../db_entity_crud/house/entities/house.entity';
-import { Region } from '../db_entity_crud/region/entities/region.entity';
+import { House } from '../../db_entity/house/entities/house.entity';
+import { Region } from '../../db_entity/region/entities/region.entity';
 import { fetchAllHousesOutput } from './dto/fetchAllHouses.output';
 import { HouseService } from './house.service';
 import { GqlAuthAccessGuard } from 'src/common/auth/gql-auth.guard';
 import { ReqUser } from 'src/common/auth/gql-auth.param';
 import { IreqUser } from './house.type';
-import { createHouseInput } from './dto/createHouse.input';
+import { CreateHouseInput } from './dto/createHouse/createHouse.input';
 
 @Resolver()
 export class HouseResolver {
@@ -35,7 +35,7 @@ export class HouseResolver {
   // @UseGuards(GqlAuthAccessGuard)
   @Mutation(() => String)
   async createHouse(
-    @Args('houseData') houseData: createHouseInput,
+    @Args('createHouseInput') createHouseInput: CreateHouseInput,
     // @ReqUser() reqUser: IreqUser,
   ) {
     // const obj = {
@@ -60,9 +60,8 @@ export class HouseResolver {
     };
     // 1. 등록!!
     return await this.houseService.create({
-      houseData,
-      user_auth_id: reqUser.user_auth_id,
-      auth_method: reqUser.auth_method,
+      createHouseInput,
+      reqUser,
     });
   }
 }

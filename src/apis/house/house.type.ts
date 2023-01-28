@@ -1,9 +1,8 @@
-import { createHouseInput } from './dto/createHouse.input';
+import { CreateHouseInput } from './dto/createHouse/createHouse.input';
 
 export interface Icreate {
-  houseData: createHouseInput;
-  user_auth_id: string;
-  auth_method: number;
+  createHouseInput: CreateHouseInput;
+  reqUser: IreqUser;
 }
 
 // export interface IhouseData {
@@ -27,4 +26,5 @@ export interface Icreate {
 export interface IreqUser {
   user_auth_id: string;
   name: string;
+  auth_method: number;
 }
