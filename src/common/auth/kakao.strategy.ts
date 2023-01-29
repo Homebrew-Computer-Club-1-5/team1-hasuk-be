@@ -1,4 +1,4 @@
-import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-kakao';
+// import { PassportStrategy } from '@nestjs/passport';
+// import { Strategy } from 'passport-kakao';
 
-export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {}
+// export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {}
