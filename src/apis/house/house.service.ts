@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { House } from '../../db_entity/house/entities/house.entity';
 import { House_cost } from '../../db_entity/house_cost/entities/house_cost.entity';
 import { House_location } from '../../db_entity/house_location/entities/house_location.entity';
@@ -8,10 +8,14 @@ import { Region } from '../../db_entity/region/entities/region.entity';
 import { User } from '../../db_entity/user/entities/user.entity';
 import { Icreate } from './house.type';
 import { House_img } from '../../db_entity/house_img/entities/house_img.entity';
+import { HttpService } from '@nestjs/axios';
+import { Storage } from '@google-cloud/storage';
 
 @Injectable()
 export class HouseService {
   constructor(
+    private readonly httpService: HttpService,
+
     @InjectRepository(House)
     private readonly houseRepository: Repository<House>,
 
@@ -29,6 +33,9 @@ export class HouseService {
 
     @InjectRepository(House_img)
     private readonly house_imgRepository: Repository<House_img>,
+
+    @InjectDataSource()
+    private dataSource: DataSource,
   ) {}
 
   async findAllHouses() {
@@ -99,9 +106,36 @@ export class HouseService {
     // 4. N:1 테이블 등록 - 이미지
     // 1) imgRawData[] => img_url[] 로 전환
     const imgRawDatas = rest.imgRawDatas;
+    const img_urls = [];
+    const waitedFiles = await Promise.all(imgRawDatas);
+
+    const storage = new Storage({
+      projectId: 'board-373207',
+      keyFilename: 'board-373207-a02f17b5865d.json',
+    }).bucket('hasuk-storage');
+
+    await Promise.all(
+      waitedFiles.map((el) => {
+        new Promise(async (resolve, reject) => {
+          const time = Date.now();
+          
+          img_urls.push('https://storage.cloud.google.com/hasuk-storage/' + time + '.jpg')
+
+          el.createReadStream()
+            .pipe(storage.file(time + '.jpg').createWriteStream())
+            .on('finish', () => {
+              resolve(`hasuk-storage/${time}.jpg`);
+            })
+            .on('error', () => {
+              reject();
+            });
+        });
+      }),
+    );
+
 
     // 2) img_url[] 를 저장
-    const img_urls = ['url1', 'url2', 'url3'];
+    
     const house_id = houseResult.id;
     const img_urlsResult = []; // [{id : 1 , img_url : "url1",house_id : 1}]
     for (let i = 0; i < img_urls.length; i++) {
