@@ -97,17 +97,15 @@ type Query {
 
 type Mutation {
   createHouse(createHouseInput: CreateHouseInput!): String!
-  saveImage(files: [Upload!]!, house_id: Int!): [String!]!
 }
 
 input CreateHouseInput {
   house: HouseInput!
   house_location: House_locationInput!
   house_cost: House_costInput!
-  university_id: Int!
   region_id: Int!
   house_category_id: Int!
-  imgRawDatas: [String!]!
+  imgRawDatas: [Upload!]
 }
 
 input HouseInput {

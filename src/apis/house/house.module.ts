@@ -11,6 +11,7 @@ import { User } from '../../db_entity/user/entities/user.entity';
 import { HouseResolver } from './house.resolver';
 import { HouseService } from './house.service';
 import { House_location } from '../../db_entity/house_location/entities/house_location.entity';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { House_location } from '../../db_entity/house_location/entities/house_lo
       House_location,
     ]),
     JwtAccessStrategy,
+    HttpModule,
   ],
   providers: [HouseResolver, HouseService],
 })
