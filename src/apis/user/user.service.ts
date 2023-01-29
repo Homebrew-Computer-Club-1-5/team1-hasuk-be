@@ -10,7 +10,19 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async findOne() {}
+  async findOne({ user_auth_id, name, auth_method }) {
+    const result = await this.userRepository.findOne({
+      where: { user_auth_id, name, auth_method },
+    });
+    return result;
+  }
 
-  async create() {}
+  async create({ user_auth_id, name, auth_method }) {
+    const result = await this.userRepository.save({
+      user_auth_id,
+      name,
+      auth_method,
+    });
+    return result;
+  }
 }
