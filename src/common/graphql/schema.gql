@@ -95,5 +95,8 @@ type Query {
 }
 
 type Mutation {
-  saveImage(img_urls: [String!]!): [String!]!
+  saveImage(files: [Upload!]!, house_id: Int!): [String!]!
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
