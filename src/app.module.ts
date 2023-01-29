@@ -10,6 +10,8 @@ import { CrawlModule } from './apis/crawl/crawl.module';
 import { HouseModule } from './apis/house/house.module';
 // import { ImgModule } from './apis/Img/Img.module';
 // import { ImgUploadModule } from './apis/Img_upload/Img.module';
+import { AuthModule } from './apis/auth/auth.module';
+import { UserModule } from './apis/user/user.module';
 
 @Module({
   imports: [
@@ -37,7 +39,10 @@ import { HouseModule } from './apis/house/house.module';
       logging: false,
     }),
     ScheduleModule.forRoot(),
+    AuthModule,
+    UserModule,
   ],
+  // providers: [AuthResolver, AuthService],
   //   controllers: [AppController],
   //   providers: [AppService],
 })
