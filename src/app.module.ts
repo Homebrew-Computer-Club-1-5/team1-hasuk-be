@@ -9,8 +9,6 @@ import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MainSpotModule } from './apis/mainSpot/mainSpot.module';
 import { CrawlModule } from './apis/crawl/crawl.module';
-
-import { ImgUploadModule } from './apis/Img_upload/Img_upload.module';
 import { AuthModule } from './apis/auth/auth.module';
 import { UserModule } from './apis/user/user.module';
 
@@ -22,7 +20,6 @@ import { UserModule } from './apis/user/user.module';
     MainSpotModule,
     HouseModule,
     ImgModule,
-    ImgUploadModule,
     CrawlModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
