@@ -1,11 +1,11 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Injectable } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { crawl } from './functions/crawl';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { HttpService } from '@nestjs/axios';
 import { createWriteStream } from 'fs';
-import { Storage } from "@google-cloud/storage";
+import { Storage } from '@google-cloud/storage';
 
 const boardInfos = [
   {
@@ -38,7 +38,7 @@ const boardInfos = [
 @Injectable()
 export class CrawlService {
   constructor(
-    private readonly httpService : HttpService,
+    private readonly httpService: HttpService,
     @InjectDataSource()
     private dataSource: DataSource,
   ) {}
@@ -48,7 +48,10 @@ export class CrawlService {
 
     let result: number;
     await this.dataSource
-      .query('SELECT MAX(board_date) as result FROM tb_house WHERE house_category_id = ? ', [category_id])
+      .query(
+        'SELECT MAX(board_date) as result FROM tb_house WHERE house_category_id = ? ',
+        [category_id],
+      )
       .then((prom) => {
         result = prom[0].result;
       });
@@ -84,10 +87,9 @@ export class CrawlService {
       console.log('조회중인 전화번호 : ' + contactNumber);
       //1. 전화번호 조회
       await this.dataSource
-        .query(
-          'SELECT id, is_crolled FROM tb_house WHERE contact_number = ?',
-          [contactNumber],
-        )
+        .query('SELECT id, is_crolled FROM tb_house WHERE contact_number = ?', [
+          contactNumber,
+        ])
         .then((prom) => {
           console.log(prom);
           if (prom[0]) {
@@ -112,7 +114,7 @@ export class CrawlService {
           //3-2.크롤링 했던게 아니면 boardDate, other_info, imgs, isColled , (has_empty)
           this.dataSource.query(
             'UPDATE tb_house SET house_other_info = ?, has_empty = 1, is_crolled = 1, board_date = ?, house_category_id = ? WHERE id = ? and is_crolled != 1 ',
-            [otherInfo, boardDate,category_id, house_id],
+            [otherInfo, boardDate, category_id, house_id],
           );
           this.dataSource.query(
             'DELETE FROM tb_house_img WHERE house_id = ? ',
@@ -120,36 +122,46 @@ export class CrawlService {
           );
 
           //이미지들 삽입
-          
+
           const storage = new Storage({
             projectId: 'board-373207',
             keyFilename: 'board-373207-a02f17b5865d.json',
           }).bucket('hasuk-storage');
 
           const results = await Promise.all(
-            homeImgUrls.map((el)=>{
+            homeImgUrls.map((el) => {
               new Promise(async (resolve, reject) => {
                 const response = await this.httpService.axiosRef({
-                    url : el, 
-                    method: 'GET',
-                    responseType: 'stream',
+                  url: el,
+                  method: 'GET',
+                  responseType: 'stream',
                 });
-                
+
                 const time = Date.now();
 
                 //db에 이미지url삽입
                 this.dataSource.query(
                   'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
-                  ['https://storage.cloud.google.com/hasuk-storage/'+time+'.jpg', house_id],
+                  [
+                    'https://storage.cloud.google.com/hasuk-storage/' +
+                      time +
+                      '.jpg',
+                    house_id,
+                  ],
                 );
-                
+
                 //storage에 저장
-                response.data.pipe(storage.file(time+'.jpg').createWriteStream())
-                .on('finish', ()=>{resolve(`hasuk-storage/${time}.jpg`)})
-                .on('error',  ()=>{reject()});
+                response.data
+                  .pipe(storage.file(time + '.jpg').createWriteStream())
+                  .on('finish', () => {
+                    resolve(`hasuk-storage/${time}.jpg`);
+                  })
+                  .on('error', () => {
+                    reject();
+                  });
               });
-            })
-          );          
+            }),
+          );
         }
       } else {
         //3. 전화번호가 없으면 insert
@@ -170,34 +182,44 @@ export class CrawlService {
           });
 
         //이미지들 삽입
-          
+
         const storage = new Storage({
           projectId: 'board-373207',
           keyFilename: 'board-373207-a02f17b5865d.json',
         }).bucket('hasuk-storage');
 
         const results = await Promise.all(
-          homeImgUrls.map((el)=>{
+          homeImgUrls.map((el) => {
             new Promise(async (resolve, reject) => {
               const response = await this.httpService.axiosRef({
-                  url : el, 
-                  method: 'GET',
-                  responseType: 'stream',
-                });
+                url: el,
+                method: 'GET',
+                responseType: 'stream',
+              });
               const time = Date.now();
               //db에 이미지url삽입
               this.dataSource.query(
                 'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
-                ['https://storage.cloud.google.com/hasuk-storage/'+time+'.jpg', house_id],
+                [
+                  'https://storage.cloud.google.com/hasuk-storage/' +
+                    time +
+                    '.jpg',
+                  house_id,
+                ],
               );
-              
+
               //storage에 저장
-              response.data.pipe(storage.file(time+'.jpg').createWriteStream())
-              .on('finish', ()=>{resolve(`hasuk-storage/${time}.jpg`)})
-              .on('error',  ()=>{reject()});
+              response.data
+                .pipe(storage.file(time + '.jpg').createWriteStream())
+                .on('finish', () => {
+                  resolve(`hasuk-storage/${time}.jpg`);
+                })
+                .on('error', () => {
+                  reject();
+                });
             });
-          })
-        );    
+          }),
+        );
       }
     }
     return;
@@ -224,7 +246,7 @@ export class CrawlService {
       console.log(`${boardInfo.board_name} 게시판 latestBoardDate 조회 `);
       // 1. latestBoardDate DB에서 조회
       const latestBoardDate = await this.findLatestBoardDate(
-        boardInfo.house_category_id
+        boardInfo.house_category_id,
       ); // 여기 인자로 house_category_id 들어가야함
       // const latestBoardDate = 1674117774000;
       const result = await crawl(
