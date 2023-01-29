@@ -16,11 +16,11 @@ export class User {
   // @Field(()=>Int)
   id: number;
 
-  @Column({ type: 'varchar', length: '40' })
+  @Column({ type: 'varchar', length: '60' })
   // @Field(()=>String, {nullable : true})
   user_auth_id: string;
 
-  @Column({ type: 'varchar', length: '15' })
+  @Column({ type: 'varchar', length: '60' })
   // @Field(()=>String, {nullable : true})
   name: string;
 
