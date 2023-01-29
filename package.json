@@ -36,6 +36,7 @@
     "apollo-server-express": "^3.11.1",
     "axios": "^1.2.4",
     "graphql": "^16.6.0",
+    "graphql-upload": "^13.0.0",
     "mysql2": "^2.3.3",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
