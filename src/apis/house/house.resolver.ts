@@ -17,6 +17,7 @@ export class HouseResolver {
   //모든부근의 모든 집 정보를 가져오기
   @Query(() => [Region])
   fetchAllHouses() {
+    console.log(1);
     return this.houseService.findAllHouses();
   }
 
