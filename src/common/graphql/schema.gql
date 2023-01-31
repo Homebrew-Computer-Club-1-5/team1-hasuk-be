@@ -2,7 +2,7 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Cost {
+type House_cost {
   id: Int!
   month_cost: Int!
   deposit: Int
@@ -42,13 +42,13 @@ type Region {
 
 type House {
   id: Int!
-  contact_number: String!
-  gender: Int!
-  min_residence: String!
+  contact_number: String
+  gender: Int
   house_other_info: String
-  has_empty: Int!
-  is_crolled: Int!
-  cost: Cost!
+  has_empty: Int
+  is_crolled: Int
+  board_date: Int
+  house_cost: House_cost!
   house_location: House_location!
   house_category: House_category!
   region: Region!
@@ -74,15 +74,16 @@ type ImgurlOutput {
 
 type fetchAllHousesOutput {
   id: Int!
-  contact_number: String!
-  gender: Int!
-  min_residence: String!
+  contact_number: String
+  gender: Int
   house_other_info: String
-  has_empty: Int!
-  is_crolled: Int!
+  has_empty: Int
+  is_crolled: Int
+  board_date: Int
   month_cost: Int!
   img_urls: [ImgurlOutput!]!
   nearest_main_spot_name: String!
+  region_name: String!
 }
 
 type Query {
@@ -91,4 +92,38 @@ type Query {
   fetchHousesByRegion(region_id: Float!): [fetchAllHousesOutput!]!
   fetchHouse(house_id: Float!): House!
   fetchImgsByHouse(houseId: Float!): [House_img!]!
+  kakaoLogin: String!
 }
+
+type Mutation {
+  createHouse(createHouseInput: CreateHouseInput!): String!
+}
+
+input CreateHouseInput {
+  house: HouseInput!
+  house_location: House_locationInput!
+  house_cost: House_costInput!
+  region_id: Int!
+  house_category_id: Int!
+  imgRawDatas: [Upload!]
+}
+
+input HouseInput {
+  contact_number: String
+  gender: Int
+  house_other_info: String
+}
+
+input House_locationInput {
+  latitude: Float!
+  longitude: Float!
+}
+
+input House_costInput {
+  month_cost: Int!
+  deposit: Int
+  other_info: String
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
