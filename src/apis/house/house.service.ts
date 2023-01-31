@@ -54,11 +54,18 @@ export class HouseService {
   async findHouse({ house_id }) {
     return await this.houseRepository.findOne({
       where: { id: house_id },
-      relations: ['house_location', 'cost', 'house_category', 'region', 'imgs'],
+      relations: [
+        'house_location',
+        'house_cost',
+        'house_category',
+        'region',
+        'imgs',
+      ],
     });
   }
 
   async create({ createHouseInput, reqUser }: Icreate) {
+    console.log('게시물 등록 진행');
     const { user_auth_id, auth_method } = reqUser;
     const { house, house_location, house_cost, ...rest } = createHouseInput;
     // 1. 1:1 테이블 등록
@@ -106,6 +113,7 @@ export class HouseService {
     // 4. N:1 테이블 등록 - 이미지
     // 1) imgRawData[] => img_url[] 로 전환
     const imgRawDatas = rest.imgRawDatas;
+    console.log(imgRawDatas[0]);
     const img_urls = [];
     const waitedFiles = await Promise.all(imgRawDatas);
 
@@ -150,6 +158,6 @@ export class HouseService {
 
     // 4. 등록결과 리턴
     // return { houseResult, img_urlsResult };
-    return '성공';
+    return house_id;
   }
 }

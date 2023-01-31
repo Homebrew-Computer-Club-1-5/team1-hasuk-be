@@ -23,5 +23,4 @@ export class CreateHouseInput {
 
   @Field(() => [GraphQLUpload], { nullable: true })
   imgRawDatas: FileUpload[]; // 수정 완료
-
 }

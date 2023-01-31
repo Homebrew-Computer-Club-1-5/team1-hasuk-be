@@ -19,18 +19,24 @@ export class AuthService {
     console.log(1);
     const refreshToken = this.jwtService.sign(
       { user_auth_id, auth_method },
-      { secret: 'jwtRefreshKey', expiresIn: '2w' },
+      { secret: 'jwtRefreshStrategyKey', expiresIn: '2w' },
     );
-    if (res)
-      res.setHeader('Set-Cookie', `refreshToken=${refreshToken}; path=/;`);
+    if (res) {
+      // res.setHeader('Access-Control-Allow-Origin', `http://localhost:3000`);
+      // res.setHeader('Access-Control-Allow-Credentials', `true`);
+      res.setHeader(
+        'Set-Cookie',
+        `refreshToken=${refreshToken}; path=/; domain:localhost;`,
+      );
+    }
 
     // 액세스 토큰 만들어서
     const accessToken = this.jwtService.sign(
       { user_auth_id, auth_method },
-      { secret: 'jwtAccessKey', expiresIn: '2h' },
+      { secret: 'jwtAccessStrategyKey', expiresIn: '10s' },
     );
-    console.log('rt', refreshToken, 'at', accessToken);
-    return accessToken;
+    console.log(accessToken);
+    return { accessToken };
   }
 
   async kakaoOauth() {}

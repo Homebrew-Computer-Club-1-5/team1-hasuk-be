@@ -60,23 +60,29 @@ export class AuthController {
       res,
     );
 
-    res.send({ accessToken: makeTokensResult });
+    res.redirect(
+      `${process.env.CLIENT_URL}/main?accessToken=${makeTokensResult.accessToken}`,
+    );
   }
 
-  @Get('/test')
+  @Get('/auth/restore-access-token')
   @UseGuards(AuthGuard('restoreAccessToken'))
-  restoreAccessToken(
+  async restoreAccessToken(
     @Req() req: Request & IOauthUser, //
+    @Res() res: Response,
   ) {
+    console.log('restore 성공~');
     const { auth_method, user_auth_id } = req.user;
     //1. 리프레시 토큰 받아서 2주 지났는지 확인
 
     //2. 2주 지났으면 => "장기간 로그아웃으로 재 로그인이 필요합니다." 에러메세지 + 로그인 화면으로 리다렉션
 
     //3. 안지났으면 => 액세스 토큰 재발급해서 리턴
-    return this.authService.makeTokens(
+    const restoreAccesTokenResult = await this.authService.makeTokens(
       { auth_method, user_auth_id },
       undefined,
     );
+
+    res.send(restoreAccesTokenResult.accessToken);
   }
 }
