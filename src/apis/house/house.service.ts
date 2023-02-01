@@ -64,6 +64,83 @@ export class HouseService {
     });
   }
 
+  async findMyHouses({ reqUser }) {
+    const { user_auth_id, auth_method } = reqUser;
+    // 1. reqUser로 유저 조회
+    const userResult = await this.userRepository.findOne({
+      where: { user_auth_id: user_auth_id, auth_method: auth_method },
+    });
+
+    // 2. tb_house_user에서 house_id들 모두 조회
+    const house_userResult = await this.userRepository.findOne({
+      where: { id: userResult.id },
+      relations: ['houses'],
+    });
+    // console.log('1', house_userResult.houses);
+
+    // 거기서 house_id들만 뽑아내기
+    const house_ids = house_userResult.houses.map((house) => house.id);
+
+    // 3. house_location 에서 좌표 조회
+    const house_locationResults = [];
+    for (let i = 0; i < house_ids.length; i++) {
+      const house_id = house_ids[i];
+      const house_locationResult = await this.house_locationRepository.findOne({
+        where: { id: house_id },
+      });
+      house_locationResults.push(house_locationResult);
+    }
+    // console.log('좌표', house_locationResults);
+
+    // 4. house_img 에서 이미지 링크 조회
+    const house_imgResults = [];
+    for (let i = 0; i < house_ids.length; i++) {
+      const house_id = house_ids[i];
+      const houseResult = await this.houseRepository.findOne({
+        where: { id: house_id },
+        relations: ['imgs'],
+      });
+      // console.log('조회중인 house의 img들', house_id, houseResult.imgs);
+      const aaa = houseResult.imgs.map((house_img) => house_img.img_url);
+      house_imgResults.push({
+        id: house_id,
+        img_urls: aaa,
+      });
+    }
+    // console.log(house_imgResults);
+
+    const lastResult = house_ids.map((house_id) => {
+      const result1 = house_userResult.houses.find(
+        (house) => house.id === house_id,
+      );
+
+      const result2 = house_locationResults.find(
+        (house_location) => house_location.id === house_id,
+      );
+
+      const result3 = house_imgResults.find(
+        (house_imgResult) => house_imgResult.id === house_id,
+      );
+
+      const result4 = {
+        img_urls: result3.img_urls,
+        contact_number: result1.contact_number,
+        location: {
+          latitude: result2.latitude,
+          longitude: result2.longitude,
+        },
+        boardDate: result1.board_date,
+      };
+      return result4;
+    });
+    return lastResult;
+  }
+  async findHouseByLocation({ location }) {
+    return await this.house_locationRepository.findOne({
+      where: { longitude: location.longitude, latitude: location.latitude },
+    });
+  }
+
   async create({ createHouseInput, reqUser }: Icreate) {
     console.log('게시물 등록 진행');
     const { user_auth_id, auth_method } = reqUser;

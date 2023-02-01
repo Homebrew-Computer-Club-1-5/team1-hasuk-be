@@ -9,6 +9,9 @@ import { GqlAuthAccessGuard } from 'src/common/auth/gql-auth.guard';
 import { ReqUser } from 'src/common/auth/gql-auth.param';
 import { IreqUser } from './house.type';
 import { CreateHouseInput } from './dto/createHouse/createHouse.input';
+import { House_locationInput } from './dto/createHouse/createHouse.house_location.input';
+import { House_location } from 'src/db_entity/house_location/entities/house_location.entity';
+import { FetchMyHouseOutput } from './dto/fetchMyHouse/fetchMyHouse.output';
 
 @Resolver()
 export class HouseResolver {
@@ -41,11 +44,6 @@ export class HouseResolver {
     // @GqlRes() res: Response,
   ) {
     console.log('유저 인가 완료', reqUser);
-    // const reqUser = {
-    //   user_auth_id: 'gunpoll823@gmail.com',
-    //   name: '김건',
-    //   auth_method: 1,
-    // };
     // 1. 등록!!
     const result2 = await this.houseService.create({
       createHouseInput,
@@ -53,5 +51,16 @@ export class HouseResolver {
     });
     console.log(result2);
     return result2;
+  }
+
+  @Query(() => House_location)
+  async fetchHouseByLocation(@Args('location') location: House_locationInput) {
+    return await this.houseService.findHouseByLocation({ location });
+  }
+
+  @UseGuards(GqlAuthAccessGuard)
+  @Query(() => [FetchMyHouseOutput])
+  async fetchMyHouse(@ReqUser() reqUser: IreqUser) {
+    return await this.houseService.findMyHouses({ reqUser });
   }
 }
