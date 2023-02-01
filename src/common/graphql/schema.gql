@@ -86,13 +86,32 @@ type fetchAllHousesOutput {
   region_name: String!
 }
 
+type House_locationExceptId {
+  latitude: Float!
+  longitude: Float!
+}
+
+type FetchMyHouseOutput {
+  img_urls: [String!]!
+  contact_number: String!
+  location: House_locationExceptId!
+  boardDate: Float!
+}
+
 type Query {
   fetchMainSpots: [Main_spot!]!
   fetchAllHouses: [Region!]!
   fetchHousesByRegion(region_id: Float!): [fetchAllHousesOutput!]!
   fetchHouse(house_id: Float!): House!
+  fetchHouseByLocation(location: House_locationInput!): House_location!
+  fetchMyHouse: [FetchMyHouseOutput!]!
   fetchImgsByHouse(houseId: Float!): [House_img!]!
   kakaoLogin: String!
+}
+
+input House_locationInput {
+  latitude: Float!
+  longitude: Float!
 }
 
 type Mutation {
@@ -112,11 +131,6 @@ input HouseInput {
   contact_number: String
   gender: Int
   house_other_info: String
-}
-
-input House_locationInput {
-  latitude: Float!
-  longitude: Float!
 }
 
 input House_costInput {

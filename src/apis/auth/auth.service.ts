@@ -33,7 +33,7 @@ export class AuthService {
     // 액세스 토큰 만들어서
     const accessToken = this.jwtService.sign(
       { user_auth_id, auth_method },
-      { secret: 'jwtAccessStrategyKey', expiresIn: '10s' },
+      { secret: 'jwtAccessStrategyKey', expiresIn: '1h' },
     );
     console.log(accessToken);
     return { accessToken };
