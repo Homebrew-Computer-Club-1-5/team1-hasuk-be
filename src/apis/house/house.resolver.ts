@@ -13,6 +13,7 @@ import { House_location } from 'src/db_entity/house_location/entities/house_loca
 import { FetchMyHouseOutput } from './dto/fetchMyHouse/fetchMyHouse.output';
 import { UpdateMyHouseInput } from './dto/updateMyHouse/updateMyHouse.input';
 import { FetchCrawledHousesOutput } from './dto/fetchCrawledHouses/fetchCrawledHouses.output';
+import { House_img } from 'src/db_entity/house_img/entities/house_img.entity';
 
 @Resolver()
 export class HouseResolver {
@@ -65,12 +66,17 @@ export class HouseResolver {
     return await this.houseService.findMyHouses({ reqUser });
   }
 
-  @UseGuards(GqlAuthAccessGuard)
+  // @UseGuards(GqlAuthAccessGuard)
   @Mutation(() => String)
   async deleteMyHouse(
-    @ReqUser() reqUser: IreqUser,
+    // @ReqUser() reqUser: IreqUser,
     @Args('house_id') house_id: number,
   ) {
+    const reqUser: IreqUser = {
+      user_auth_id: 'gunpol@naver.com',
+      name: '김건',
+      auth_method: 1,
+    };
     const result = await this.houseService.deleteMyHouse({ house_id, reqUser });
     return result;
   }
