@@ -9,6 +9,7 @@ import {
   OneToMany,
   ManyToMany,
   JoinTable,
+  DeleteDateColumn,
 } from 'typeorm';
 import { House_cost } from '../../house_cost/entities/house_cost.entity';
 import { House_category } from '../../house_category/entities/house_category.entity';
@@ -79,4 +80,7 @@ export class House {
   })
   @ManyToMany(() => User, (user) => user.houses)
   users: User[];
+
+  @DeleteDateColumn({ type: 'timestamp' })
+  deletedAt!: number | null;
 }

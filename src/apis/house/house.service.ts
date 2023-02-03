@@ -6,7 +6,7 @@ import { House_cost } from '../../db_entity/house_cost/entities/house_cost.entit
 import { House_location } from '../../db_entity/house_location/entities/house_location.entity';
 import { Region } from '../../db_entity/region/entities/region.entity';
 import { User } from '../../db_entity/user/entities/user.entity';
-import { Icreate } from './house.type';
+import { Icreate, Iupdate } from './house.type';
 import { House_img } from '../../db_entity/house_img/entities/house_img.entity';
 import { HttpService } from '@nestjs/axios';
 import { Storage } from '@google-cloud/storage';
@@ -39,9 +39,10 @@ export class HouseService {
   ) {}
 
   async findAllHouses() {
-    return await this.regionRepository.find({
+    const result = await this.regionRepository.find({
       relations: ['houses', 'houses.house_location'],
     });
+    return result;
   }
   async findAllHousesByRegion({ region_id }) {
     const builder = this.houseRepository.query(
@@ -52,7 +53,7 @@ export class HouseService {
   }
 
   async findHouse({ house_id }) {
-    return await this.houseRepository.findOne({
+    const result = await this.houseRepository.findOne({
       where: { id: house_id },
       relations: [
         'house_location',
@@ -62,6 +63,36 @@ export class HouseService {
         'imgs',
       ],
     });
+
+    if (result.is_crolled) {
+      return {
+        id: result.id,
+        contact_number: result.contact_number,
+        is_crolled: result.is_crolled,
+        gender: result.gender,
+        house_other_info: result.house_other_info,
+        has_emtpy: result.has_empty,
+        imgs: result.imgs,
+        house_location: {
+          latitude: 123.567,
+          longitude: 123.567,
+        },
+        house_cost: {
+          month_cost: 123,
+          deposit: 123,
+          other_info: '업뎃 돈정보',
+        },
+        house_category: {
+          name: result.house_category.name,
+          id: result.house_category.id,
+        },
+        region: {
+          id: 123,
+        },
+      };
+    } else {
+      return result;
+    }
   }
 
   async findMyHouses({ reqUser }) {
@@ -76,7 +107,7 @@ export class HouseService {
       where: { id: userResult.id },
       relations: ['houses'],
     });
-    // console.log('1', house_userResult.houses);
+    console.log('1', house_userResult.houses);
 
     // 거기서 house_id들만 뽑아내기
     const house_ids = house_userResult.houses.map((house) => house.id);
@@ -94,17 +125,28 @@ export class HouseService {
 
     // 4. house_img 에서 이미지 링크 조회
     const house_imgResults = [];
+    const house_etcREsults = [];
     for (let i = 0; i < house_ids.length; i++) {
       const house_id = house_ids[i];
       const houseResult = await this.houseRepository.findOne({
         where: { id: house_id },
-        relations: ['imgs'],
+        relations: ['imgs', 'region', 'house_cost', 'house_category'],
       });
-      // console.log('조회중인 house의 img들', house_id, houseResult.imgs);
+
       const aaa = houseResult.imgs.map((house_img) => house_img.img_url);
       house_imgResults.push({
         id: house_id,
         img_urls: aaa,
+      });
+      house_etcREsults.push({
+        id: house_id,
+        region: houseResult.region.id,
+        cost: {
+          month_cost: houseResult.house_cost.month_cost,
+          deposit: houseResult.house_cost.deposit,
+          cost_other_info: houseResult.house_cost.other_info,
+        },
+        house_category: houseResult.house_category.id,
       });
     }
     // console.log(house_imgResults);
@@ -122,19 +164,65 @@ export class HouseService {
         (house_imgResult) => house_imgResult.id === house_id,
       );
 
-      const result4 = {
-        img_urls: result3.img_urls,
+      const result4 = house_etcREsults.find(
+        (house_etcREsult) => house_etcREsult.id === house_id,
+      );
+
+      const result5 = {
+        id: result1.id,
         contact_number: result1.contact_number,
+        gender: result1.gender,
+        house_other_info: result1.house_other_info,
+        region: 123,
+        cost: {
+          month_cost: 1,
+          deposit: 2,
+          cost_other_info: '1',
+        },
+        house_category: 3,
+        board_date: result1.board_date,
+        img_urls: result3.img_urls,
         location: {
           latitude: result2.latitude,
           longitude: result2.longitude,
         },
-        boardDate: result1.board_date,
       };
-      return result4;
+      return result5;
     });
     return lastResult;
   }
+
+  async deleteMyHouse({ house_id, reqUser }) {
+    const { user_auth_id, auth_method } = reqUser;
+    // 1. db에서 현재 인가요청 보낸 유저 조회
+    const userResult = await this.userRepository.findOne({
+      where: { user_auth_id: user_auth_id, auth_method: auth_method },
+    });
+
+    // 2. DB에서 house_id에 맞는 하우스 확인
+    const result1 = await this.houseRepository.findOne({
+      where: { id: house_id },
+      relations: ['users'],
+    });
+
+    // 3. 현재 로그인된 유저가, 이 house의 주인인지 검증
+    const result2 = result1.users.find((user) => {
+      console.log(user.id, userResult.id);
+      return user.id === userResult.id;
+    });
+
+    const isOwner = Boolean(result2);
+
+    // 4. 주인일시, 소프트 삭제
+    if (isOwner) {
+      const result3 = await this.houseRepository.softDelete({ id: house_id });
+      console.log('삭제 됨', result3);
+      return 'success';
+    } else {
+      return 'failed';
+    }
+  }
+
   async findHouseByLocation({ location }) {
     return await this.house_locationRepository.findOne({
       where: { longitude: location.longitude, latitude: location.latitude },
@@ -142,7 +230,6 @@ export class HouseService {
   }
 
   async create({ createHouseInput, reqUser }: Icreate) {
-    console.log('게시물 등록 진행');
     const { user_auth_id, auth_method } = reqUser;
     const { house, house_location, house_cost, ...rest } = createHouseInput;
     // 1. 1:1 테이블 등록
@@ -236,5 +323,72 @@ export class HouseService {
     // 4. 등록결과 리턴
     // return { houseResult, img_urlsResult };
     return house_id;
+  }
+
+  async update({ updateMyHouseInput, reqUser }: Iupdate) {
+    const { user_auth_id, auth_method } = reqUser;
+    const { house_id, house, house_location, house_cost, ...rest } =
+      updateMyHouseInput;
+
+    // 메인 테이블에서 FK까지 전부다 조회
+    const houseResult = await this.houseRepository.findOne({
+      where: { id: house_id },
+      relations: [
+        'house_cost',
+        'house_location',
+        'house_category',
+        'region',
+        'imgs',
+      ],
+    });
+    // console.log(houseResult);
+
+    // tb_house_location 업뎃 (좌표)
+    const result1 = await this.house_locationRepository.save({
+      id: houseResult.house_location.id,
+      latitude: house_location.latitude,
+      longitude: house_location.longitude,
+    });
+
+    // 2. 가격 업뎃
+    const result2 = await this.house_costRepository.save({
+      id: houseResult.house_cost.id,
+      month_cost: house_cost.month_cost,
+      deposit: house_cost.deposit,
+      other_info: house_cost.other_info,
+    });
+
+    // 4. house 테이블
+    // 지역 업뎃
+    const result3 = await this.houseRepository.save({
+      id: houseResult.id,
+      contact_number: house.contact_number,
+      gender: house.gender,
+      house_other_info: house.house_other_info,
+      region: { id: rest.region_id },
+      house_category: { id: rest.house_category_id },
+      has_empty: 1,
+      board_date: Date.now(),
+    });
+
+    console.log(result3);
+    return result3.id;
+    // 이미지 업뎃
+  }
+
+  async findAllCrawledHouses() {
+    const result = await this.houseRepository.find({
+      where: { is_crolled: 1 },
+      relations: ['imgs'],
+    });
+    const result2 = result.map((house) => {
+      const aaa = result[0].imgs.map((house_img) => house_img.img_url);
+      return {
+        id: house.id,
+        img_urls: aaa,
+      };
+    });
+
+    return result2;
   }
 }
