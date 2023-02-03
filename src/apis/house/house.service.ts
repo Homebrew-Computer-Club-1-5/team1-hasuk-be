@@ -46,7 +46,7 @@ export class HouseService {
   }
   async findAllHousesByRegion({ region_id }) {
     const builder = this.houseRepository.query(
-      'WITH H AS (SELECT tb_house.*, JSON_ARRAYAGG(JSON_OBJECT("img_url", tb_house_img.img_url)) AS img_urls FROM tb_house, tb_house_img WHERE tb_house.id = tb_house_img.house_id GROUP BY tb_house.id), T AS (SELECT H.*, tb_region.name AS region_name, tb_house_cost.month_cost, tb_main_spot.name AS nearest_main_spot_name, (POW(tb_main_spot_location.longitude - tb_house_location.longitude, 2) + POW(tb_main_spot_location.latitude - tb_house_location.latitude, 2)) AS mainSpotDistance FROM H, tb_house_location, tb_main_spot_location, tb_main_spot, tb_house_cost, tb_region WHERE H.region_id = ? AND H.region_id = tb_region.id AND H.house_location_id = tb_house_location.id AND tb_main_spot.main_spot_location_id = tb_main_spot_location.id AND tb_house_cost.id = H.cost_id) SELECT  T.* from T, (SELECT id, MIN(mainSpotDistance) as nd from T group by T.id) AS T2 WHERE T.mainSpotDistance = T2.nd and T.id = T2.id;',
+      'WITH H AS (SELECT tb_house.*, JSON_ARRAYAGG(tb_house_img.img_url) AS img_urls FROM tb_house LEFT JOIN tb_house_img ON tb_house.id = tb_house_img.house_id  GROUP BY tb_house.id), T AS (SELECT H.*, tb_region.name AS region_name, tb_house_cost.month_cost, tb_main_spot.name AS nearest_main_spot_name, (POW(tb_main_spot_location.longitude - tb_house_location.longitude, 2) + POW(tb_main_spot_location.latitude - tb_house_location.latitude, 2)) AS mainSpotDistance FROM H, tb_house_location, tb_main_spot_location, tb_main_spot, tb_house_cost, tb_region WHERE H.region_id = ? AND H.region_id = tb_region.id AND H.house_location_id = tb_house_location.id AND tb_main_spot.main_spot_location_id = tb_main_spot_location.id AND tb_house_cost.id = H.cost_id) SELECT  T.* from T, (SELECT id, MIN(mainSpotDistance) as nd from T group by T.id) AS T2 WHERE T.mainSpotDistance = T2.nd and T.id = T2.id;',
       [region_id],
     );
     return await builder;
@@ -204,7 +204,7 @@ export class HouseService {
       where: { id: house_id },
       relations: ['users'],
     });
-
+    
     // 3. 현재 로그인된 유저가, 이 house의 주인인지 검증
     const result2 = result1.users.find((user) => {
       console.log(user.id, userResult.id);
@@ -217,6 +217,30 @@ export class HouseService {
     if (isOwner) {
       const result3 = await this.houseRepository.softDelete({ id: house_id });
       console.log('삭제 됨', result3);
+
+      const storage = new Storage({
+        projectId: 'board-373207',
+        keyFilename: 'board-373207-a02f17b5865d.json',
+      }).bucket('hasuk-storage');
+      
+      const result4 = await this.house_imgRepository.find({
+        where : {house : {id : house_id}},
+        relations: ['house'],
+      });
+
+      console.log(result4);
+      //storage에서 삭제
+      result4.map((el)=>{
+          const filename = el.img_url.substring(el.img_url.lastIndexOf('/') + 1);
+          console.log("filename : " + filename);
+          storage.file(filename).delete();
+      })
+
+      
+
+      //db에서 삭제
+     await this.house_imgRepository.delete({house : {id : house_id}});
+
       return 'success';
     } else {
       return 'failed';
@@ -372,8 +396,67 @@ export class HouseService {
     });
 
     console.log(result3);
-    return result3.id;
     // 이미지 업뎃
+
+    const storage = new Storage({
+      projectId: 'board-373207',
+      keyFilename: 'board-373207-a02f17b5865d.json',
+    }).bucket('hasuk-storage');
+    
+    const result4 = await this.house_imgRepository.find({
+      where : {house : {id : house_id}},
+      relations: ['house'],
+    });
+
+    console.log(result4);
+    //storage에서 삭제
+    result4.map((el)=>{
+        const filename = el.img_url.substring(el.img_url.lastIndexOf('/') + 1);
+        storage.file(filename).delete();
+    })
+    //db에서 삭제
+    await this.house_imgRepository.delete({house : {id : house_id}});
+
+    //새로운 이미지파일로 업데이트
+    const imgRawDatas = rest.imgRawDatas;
+    const img_urls = [];
+    const waitedFiles = await Promise.all(imgRawDatas);
+
+    await Promise.all(
+      waitedFiles.map((el) => {
+        new Promise(async (resolve, reject) => {
+          const time = Date.now();
+
+          img_urls.push(
+            'https://storage.cloud.google.com/hasuk-storage/' + time + '.jpg',
+          );
+
+          el.createReadStream()
+            .pipe(storage.file(time + '.jpg').createWriteStream())
+            .on('finish', () => {
+              resolve(`hasuk-storage/${time}.jpg`);
+            })
+            .on('error', () => {
+              reject();
+            });
+        });
+      }),
+    );
+
+    // 2) img_url[] 를 저장
+
+    const img_urlsResult = []; // [{id : 1 , img_url : "url1",house_id : 1}]
+    for (let i = 0; i < img_urls.length; i++) {
+      const img_url = img_urls[i];
+      const img_urlResult = await this.house_imgRepository.save({
+        img_url,
+        house: { id: house_id },
+      });
+      img_urlsResult.push(img_urlResult);
+    }
+
+
+    return result3.id;
   }
 
   async findAllCrawledHouses() {

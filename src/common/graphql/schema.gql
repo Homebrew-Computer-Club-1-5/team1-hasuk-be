@@ -168,5 +168,6 @@ input UpdateMyHouseInput {
   house_cost: House_costInput!
   region_id: Int!
   house_category_id: Int!
+  imgRawDatas: [Upload!]
   house_id: Int!
 }
