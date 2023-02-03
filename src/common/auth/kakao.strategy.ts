@@ -15,7 +15,6 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
         kakao_account: { email },
       },
     } = profile;
-    console.log('스트레트지');
     return {
       auth_method: 1,
       name: username,

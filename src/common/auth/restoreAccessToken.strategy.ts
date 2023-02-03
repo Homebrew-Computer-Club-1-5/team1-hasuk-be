@@ -17,8 +17,8 @@ export class RestoreAcessToken extends PassportStrategy(
     super({
       jwtFromRequest: (req) => {
         const cookie = req.headers.cookie;
+        console.log(cookie);
         const refreshToken = getRefreshTokenFromCookies(cookie);
-        console.log(refreshToken);
         return refreshToken;
       },
       secretOrKey: 'jwtRefreshStrategyKey',
