@@ -62,7 +62,7 @@ export class HouseResolver {
   @UseGuards(GqlAuthAccessGuard)
   @Query(() => [FetchMyHouseOutput])
   async fetchMyHouse(@ReqUser() reqUser: IreqUser) {
-    console.log(1);
+    console.log('fetchMyHouse실행');
     return await this.houseService.findMyHouses({ reqUser });
   }
 
@@ -87,7 +87,6 @@ export class HouseResolver {
     @Args('updateMyHouseInput') updateMyHouseInput: UpdateMyHouseInput,
     // @ReqUser() reqUser: IreqUser,
   ) {
-    // 1. 등록!!
     const reqUser: IreqUser = {
       user_auth_id: 'gunpol@naver.com',
       name: '김건',
@@ -103,5 +102,12 @@ export class HouseResolver {
   @Query(() => [FetchCrawledHousesOutput])
   async fetchCrawledHouses() {
     return await this.houseService.findAllCrawledHouses();
+  }
+
+  @UseGuards(GqlAuthAccessGuard)
+  @Query(() => String)
+  async test(@ReqUser() reqUser: IreqUser) {
+    console.log(reqUser);
+    return 'success';
   }
 }

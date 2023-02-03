@@ -123,6 +123,7 @@ type Query {
   fetchHouseByLocation(location: House_locationInput!): House_location!
   fetchMyHouse: [FetchMyHouseOutput!]!
   fetchCrawledHouses: [FetchCrawledHousesOutput!]!
+  test: String!
   fetchImgsByHouse(houseId: Float!): [House_img!]!
   kakaoLogin: String!
 }

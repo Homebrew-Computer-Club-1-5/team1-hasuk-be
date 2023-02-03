@@ -107,7 +107,6 @@ export class HouseService {
       where: { id: userResult.id },
       relations: ['houses'],
     });
-    console.log('1', house_userResult.houses);
 
     // 거기서 house_id들만 뽑아내기
     const house_ids = house_userResult.houses.map((house) => house.id);
@@ -125,7 +124,7 @@ export class HouseService {
 
     // 4. house_img 에서 이미지 링크 조회
     const house_imgResults = [];
-    const house_etcREsults = [];
+    const house_etcResults = [];
     for (let i = 0; i < house_ids.length; i++) {
       const house_id = house_ids[i];
       const houseResult = await this.houseRepository.findOne({
@@ -138,13 +137,13 @@ export class HouseService {
         id: house_id,
         img_urls: aaa,
       });
-      house_etcREsults.push({
+      house_etcResults.push({
         id: house_id,
         region: houseResult.region.id,
         cost: {
           month_cost: houseResult.house_cost.month_cost,
           deposit: houseResult.house_cost.deposit,
-          cost_other_info: houseResult.house_cost.other_info,
+          other_info: houseResult.house_cost.other_info,
         },
         house_category: houseResult.house_category.id,
       });
@@ -164,22 +163,22 @@ export class HouseService {
         (house_imgResult) => house_imgResult.id === house_id,
       );
 
-      const result4 = house_etcREsults.find(
-        (house_etcREsult) => house_etcREsult.id === house_id,
-      );
+      const result4 = house_etcResults.find((house_etcREsult) => {
+        return house_etcREsult.id === house_id;
+      });
 
       const result5 = {
         id: result1.id,
         contact_number: result1.contact_number,
         gender: result1.gender,
         house_other_info: result1.house_other_info,
-        region: 123,
+        region: result4.region,
         cost: {
-          month_cost: 1,
-          deposit: 2,
-          cost_other_info: '1',
+          month_cost: result4.cost.month_cost,
+          deposit: result4.cost.deposit,
+          other_info: result4.cost.other_info,
         },
-        house_category: 3,
+        house_category: result4.house_category,
         board_date: result1.board_date,
         img_urls: result3.img_urls,
         location: {
@@ -212,6 +211,7 @@ export class HouseService {
     });
 
     const isOwner = Boolean(result2);
+    /// 여기에 날리는거 (db, gcp)
 
     // 4. 주인일시, 소프트 삭제
     if (isOwner) {
@@ -395,7 +395,6 @@ export class HouseService {
       board_date: Date.now(),
     });
 
-    console.log(result3);
     // 이미지 업뎃
 
     const storage = new Storage({
@@ -456,6 +455,7 @@ export class HouseService {
     }
 
 
+
     return result3.id;
   }
 
@@ -464,8 +464,8 @@ export class HouseService {
       where: { is_crolled: 1 },
       relations: ['imgs'],
     });
-    const result2 = result.map((house) => {
-      const aaa = result[0].imgs.map((house_img) => house_img.img_url);
+    const result2 = result.map((house, index) => {
+      const aaa = result[index].imgs.map((house_img) => house_img.img_url);
       return {
         id: house.id,
         img_urls: aaa,
