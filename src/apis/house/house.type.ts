@@ -1,7 +1,13 @@
 import { CreateHouseInput } from './dto/createHouse/createHouse.input';
+import { UpdateMyHouseInput } from './dto/updateMyHouse/updateMyHouse.input';
 
 export interface Icreate {
   createHouseInput: CreateHouseInput;
+  reqUser: IreqUser;
+}
+
+export interface Iupdate {
+  updateMyHouseInput: UpdateMyHouseInput;
   reqUser: IreqUser;
 }
 
