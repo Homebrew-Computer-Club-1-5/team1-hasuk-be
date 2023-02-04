@@ -68,10 +68,6 @@ type Main_spot {
   main_spot_location: Main_spot_location!
 }
 
-type ImgurlOutput {
-  img_url: String!
-}
-
 type fetchAllHousesOutput {
   id: Int!
   contact_number: String
@@ -81,7 +77,7 @@ type fetchAllHousesOutput {
   is_crolled: Int
   board_date: Int
   month_cost: Int!
-  img_urls: [ImgurlOutput!]!
+  img_urls: [String!]!
   nearest_main_spot_name: String!
   region_name: String!
 }
