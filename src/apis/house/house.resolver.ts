@@ -81,17 +81,17 @@ export class HouseResolver {
     return result;
   }
 
-  // @UseGuards(GqlAuthAccessGuard)
+  @UseGuards(GqlAuthAccessGuard)
   @Mutation(() => Int)
   async updateMyHouse(
     @Args('updateMyHouseInput') updateMyHouseInput: UpdateMyHouseInput,
-    // @ReqUser() reqUser: IreqUser,
+    @ReqUser() reqUser: IreqUser,
   ) {
-    const reqUser: IreqUser = {
-      user_auth_id: 'gunpol@naver.com',
-      name: '김건',
-      auth_method: 1,
-    };
+    // const reqUser: IreqUser = {
+    //   user_auth_id: 'gunpol@naver.com',
+    //   name: '김건',
+    //   auth_method: 1,
+    // };
     const result2 = await this.houseService.update({
       updateMyHouseInput,
       reqUser,

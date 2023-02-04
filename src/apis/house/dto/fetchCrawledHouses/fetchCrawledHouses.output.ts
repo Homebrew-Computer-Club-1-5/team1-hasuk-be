@@ -7,4 +7,7 @@ export class FetchCrawledHousesOutput {
 
   @Field(() => [String])
   img_urls: string[];
+
+  @Field(() => Int)
+  house_category: number;
 }

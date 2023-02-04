@@ -40,7 +40,6 @@ export async function crawl(
 ): Promise<IBoardCrawledData[]> {
   // 1. 브라우저 기본 셋팅
   const { page, browser } = await setBrowserConfigs();
-  console.log('config complete');
 
   // 2. 홈페이지로 이동
   await page.goto('https://www.koreapas.com/bbs/main.php');

@@ -6,6 +6,7 @@ import { DataSource } from 'typeorm';
 import { HttpService } from '@nestjs/axios';
 import { createWriteStream } from 'fs';
 import { Storage } from '@google-cloud/storage';
+import { v1 } from 'uuid';
 
 const boardInfos = [
   {
@@ -196,13 +197,13 @@ export class CrawlService {
                 method: 'GET',
                 responseType: 'stream',
               });
-              const time = Date.now();
+              const uuid = v1();
               //db에 이미지url삽입
               this.dataSource.query(
                 'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
                 [
                   'https://storage.cloud.google.com/hasuk-storage/' +
-                    time +
+                    uuid +
                     '.jpg',
                   house_id,
                 ],
@@ -210,9 +211,9 @@ export class CrawlService {
 
               //storage에 저장
               response.data
-                .pipe(storage.file(time + '.jpg').createWriteStream())
+                .pipe(storage.file(uuid + '.jpg').createWriteStream())
                 .on('finish', () => {
-                  resolve(`hasuk-storage/${time}.jpg`);
+                  resolve(`hasuk-storage/${uuid}.jpg`);
                 })
                 .on('error', () => {
                   reject();

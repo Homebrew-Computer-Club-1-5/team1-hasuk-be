@@ -117,11 +117,9 @@ export default async function updateCrawl(
           '#bonmoon > tbody > tr:nth-child(1) > td > div',
           (element) => element.textContent as string,
         );
-        // let otherInfo = await page.evaluate((selector) => {
-        //   let element = document.querySelector(selector);
-        //   // return Buffer.from(element.textContent, 'utf8').toString();
-        //   return element.textContent.normalize();
-        // }, '#bonmoon > tbody > tr:nth-child(1) > td > div');
+        // 출처삭제
+        const refIndex = otherInfo.indexOf('출처 : 고려대학교 고파스');
+        otherInfo = otherInfo.substring(0, refIndex);
 
         // 전화번호 - contactNumber
         const contactNumberMatchResult = otherInfo?.match(contactNumberRegExp);
