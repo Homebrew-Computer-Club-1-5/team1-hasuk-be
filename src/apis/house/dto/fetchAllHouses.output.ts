@@ -13,8 +13,8 @@ export class fetchAllHousesOutput extends OmitType(House, [
   @Field(() => Int)
   month_cost: number;
 
-  @Field(() => [ImgurlOutput])
-  img_urls: JSON;
+  @Field(() => [String])
+  img_urls: string[];
 
   @Field(() => String)
   nearest_main_spot_name: string;
