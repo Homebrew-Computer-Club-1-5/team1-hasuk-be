@@ -66,32 +66,27 @@ export class HouseResolver {
     return await this.houseService.findMyHouses({ reqUser });
   }
 
-  // @UseGuards(GqlAuthAccessGuard)
+  @UseGuards(GqlAuthAccessGuard)
   @Mutation(() => String)
   async deleteMyHouse(
-    // @ReqUser() reqUser: IreqUser,
+    @ReqUser() reqUser: IreqUser,
     @Args('house_id') house_id: number,
   ) {
-    const reqUser: IreqUser = {
-      user_auth_id: 'gunpol@naver.com',
-      name: '김건',
-      auth_method: 1,
-    };
     const result = await this.houseService.deleteMyHouse({ house_id, reqUser });
     return result;
   }
 
-  // @UseGuards(GqlAuthAccessGuard)
+  @UseGuards(GqlAuthAccessGuard)
   @Mutation(() => Int)
   async updateMyHouse(
     @Args('updateMyHouseInput') updateMyHouseInput: UpdateMyHouseInput,
-    // @ReqUser() reqUser: IreqUser,
+    @ReqUser() reqUser: IreqUser,
   ) {
-    const reqUser: IreqUser = {
-      user_auth_id: 'gunpol@naver.com',
-      name: '김건',
-      auth_method: 1,
-    };
+    // const reqUser: IreqUser = {
+    //   user_auth_id: 'gunpol@naver.com',
+    //   name: '김건',
+    //   auth_method: 1,
+    // };
     const result2 = await this.houseService.update({
       updateMyHouseInput,
       reqUser,
@@ -102,12 +97,5 @@ export class HouseResolver {
   @Query(() => [FetchCrawledHousesOutput])
   async fetchCrawledHouses() {
     return await this.houseService.findAllCrawledHouses();
-  }
-
-  @UseGuards(GqlAuthAccessGuard)
-  @Query(() => String)
-  async test(@ReqUser() reqUser: IreqUser) {
-    console.log(reqUser);
-    return 'success';
   }
 }

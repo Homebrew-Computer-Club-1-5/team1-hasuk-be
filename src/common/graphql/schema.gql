@@ -48,10 +48,10 @@ type House {
   has_empty: Int
   is_crolled: Int
   board_date: Int
-  house_cost: House_cost!
+  house_cost: House_cost
   house_location: House_location!
   house_category: House_category!
-  region: Region!
+  region: Region
   imgs: [House_img]!
 }
 
@@ -76,10 +76,12 @@ type fetchAllHousesOutput {
   has_empty: Int
   is_crolled: Int
   board_date: Int
+  house_category: House_category!
   month_cost: Int!
   img_urls: [String!]!
   nearest_main_spot_name: String!
   region_name: String!
+  house_category_id: Int!
 }
 
 type House_locationExceptId {
@@ -109,6 +111,7 @@ type FetchMyHouseOutput {
 type FetchCrawledHousesOutput {
   id: Int!
   img_urls: [String!]!
+  house_category: Int!
 }
 
 type Query {
@@ -119,7 +122,6 @@ type Query {
   fetchHouseByLocation(location: House_locationInput!): House_location!
   fetchMyHouse: [FetchMyHouseOutput!]!
   fetchCrawledHouses: [FetchCrawledHousesOutput!]!
-  test: String!
   fetchImgsByHouse(houseId: Float!): [House_img!]!
   kakaoLogin: String!
 }

@@ -6,6 +6,7 @@ import { DataSource } from 'typeorm';
 import { HttpService } from '@nestjs/axios';
 import { createWriteStream } from 'fs';
 import { Storage } from '@google-cloud/storage';
+import { v1 } from 'uuid';
 
 const boardInfos = [
   {
@@ -131,34 +132,38 @@ export class CrawlService {
           const results = await Promise.all(
             homeImgUrls.map((el) => {
               new Promise(async (resolve, reject) => {
-                const response = await this.httpService.axiosRef({
-                  url: el,
-                  method: 'GET',
-                  responseType: 'stream',
-                });
-
-                const time = Date.now();
-
-                //db에 이미지url삽입
-                this.dataSource.query(
-                  'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
-                  [
-                    'https://storage.cloud.google.com/hasuk-storage/' +
-                      time +
-                      '.jpg',
-                    house_id,
-                  ],
-                );
-
-                //storage에 저장
-                response.data
-                  .pipe(storage.file(time + '.jpg').createWriteStream())
-                  .on('finish', () => {
-                    resolve(`hasuk-storage/${time}.jpg`);
-                  })
-                  .on('error', () => {
-                    reject();
+                try {
+                  const response = await this.httpService.axiosRef({
+                    url: el,
+                    method: 'GET',
+                    responseType: 'stream',
                   });
+
+                  const time = Date.now();
+
+                  //db에 이미지url삽입
+                  this.dataSource.query(
+                    'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
+                    [
+                      'https://storage.cloud.google.com/hasuk-storage/' +
+                        time +
+                        '.jpg',
+                      house_id,
+                    ],
+                  );
+
+                  //storage에 저장
+                  response.data
+                    .pipe(storage.file(time + '.jpg').createWriteStream())
+                    .on('finish', () => {
+                      resolve(`hasuk-storage/${time}.jpg`);
+                    })
+                    .on('error', () => {
+                      reject();
+                    });
+                } catch (error) {
+                  console.log(error);
+                }
               });
             }),
           );
@@ -191,32 +196,36 @@ export class CrawlService {
         const results = await Promise.all(
           homeImgUrls.map((el) => {
             new Promise(async (resolve, reject) => {
-              const response = await this.httpService.axiosRef({
-                url: el,
-                method: 'GET',
-                responseType: 'stream',
-              });
-              const time = Date.now();
-              //db에 이미지url삽입
-              this.dataSource.query(
-                'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
-                [
-                  'https://storage.cloud.google.com/hasuk-storage/' +
-                    time +
-                    '.jpg',
-                  house_id,
-                ],
-              );
-
-              //storage에 저장
-              response.data
-                .pipe(storage.file(time + '.jpg').createWriteStream())
-                .on('finish', () => {
-                  resolve(`hasuk-storage/${time}.jpg`);
-                })
-                .on('error', () => {
-                  reject();
+              try {
+                const response = await this.httpService.axiosRef({
+                  url: el,
+                  method: 'GET',
+                  responseType: 'stream',
                 });
+                const uuid = v1();
+                //db에 이미지url삽입
+                this.dataSource.query(
+                  'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
+                  [
+                    'https://storage.cloud.google.com/hasuk-storage/' +
+                      uuid +
+                      '.jpg',
+                    house_id,
+                  ],
+                );
+
+                //storage에 저장
+                response.data
+                  .pipe(storage.file(uuid + '.jpg').createWriteStream())
+                  .on('finish', () => {
+                    resolve(`hasuk-storage/${uuid}.jpg`);
+                  })
+                  .on('error', () => {
+                    reject();
+                  });
+              } catch (error) {
+                console.log(error);
+              }
             });
           }),
         );
