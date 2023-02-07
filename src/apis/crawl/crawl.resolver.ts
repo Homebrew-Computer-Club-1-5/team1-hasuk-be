@@ -1,12 +1,13 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { CrawlService } from './crawl.service';
 
 @Resolver()
 export class CrawlResolver {
-  //   constructor(private readonly houseService: HouseService) {}
-  //특정부근의 집+가장가까운 주요지점 정보 가져오기
-  //   @Query(() => )
-  //   fetchHousesByRegion(@Args('region_id') region_id: number) {
-  //     console.log('dsgsgsg');
-  //     return this.houseService.findAllHousesByRegion({ region_id });
-  //   }
+    constructor(private readonly crawlService: CrawlService) {}
+    @Mutation(() => String)
+    async crawl(
+      @Args('latestBoardDateByArg') latestBoardDateByArg : number,
+    ) {
+      return await this.crawlService.crawl({latestBoardDateByArg});
+    }
 }

@@ -22,8 +22,6 @@ export class AuthService {
       { secret: 'jwtRefreshStrategyKey', expiresIn: '2w' },
     );
     if (res) {
-      // res.setHeader('Access-Control-Allow-Origin', `http://localhost:3000`);
-      // res.setHeader('Access-Control-Allow-Credentials', `true`);
       let date = new Date();
       date.setTime(date.getTime() + 14 * 24 * 60 * 60 * 1000); // 2 weeks in milliseconds
       res.setHeader(
@@ -35,7 +33,7 @@ export class AuthService {
     // 액세스 토큰 만들어서
     const accessToken = this.jwtService.sign(
       { user_auth_id, auth_method },
-      { secret: 'jwtAccessStrategyKey', expiresIn: '10s' },
+      { secret: 'jwtAccessStrategyKey', expiresIn: '2h' },
     );
     console.log(accessToken);
     return { accessToken };
