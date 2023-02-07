@@ -9,21 +9,21 @@ import { Storage } from '@google-cloud/storage';
 import { v1 } from 'uuid';
 
 const boardInfos = [
-  // {
-  //   board_name: '일반',
-  //   house_category_id: 1,
-  //   url: 'https://www.koreapas.com/bbs/zboard.php?category=1&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
-  // },
-  // {
-  //   board_name: '하숙',
-  //   house_category_id: 2,
-  //   url: 'https://www.koreapas.com/bbs/zboard.php?category=2&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
-  // },
-  // {
-  //   board_name: '자취/원룸',
-  //   house_category_id: 3,
-  //   url: 'https://www.koreapas.com/bbs/zboard.php?category=3&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
-  // },
+  {
+    board_name: '일반',
+    house_category_id: 1,
+    url: 'https://www.koreapas.com/bbs/zboard.php?category=1&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
+  },
+  {
+    board_name: '하숙',
+    house_category_id: 2,
+    url: 'https://www.koreapas.com/bbs/zboard.php?category=2&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
+  },
+  {
+    board_name: '자취/원룸',
+    house_category_id: 3,
+    url: 'https://www.koreapas.com/bbs/zboard.php?category=3&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
+  },
   {
     board_name: '고시원',
     house_category_id: 4,
@@ -227,7 +227,7 @@ export class CrawlService {
       // const latestBoardDate = 1674117774000;
       const result = await crawl(
         {
-          latestBoardDate: latestBoardDateByArg,
+          latestBoardDate: latestBoardDate,
           contactNumberRegExp: /\d{2,3}(-|\.|\s*)\d{3,4}(-|\.|\s*)\d{3,4}/gm,
           boardUrl: boardInfo.url,
           house_category_id: boardInfo.house_category_id,

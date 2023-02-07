@@ -9,16 +9,18 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     });
   }
   async validate(accessToken, refreshToken, profile) {
+    // console.log(profile);
     const {
       username,
       _json: {
-        kakao_account: { email },
+        kakao_account: { email, has_age_range, age_range },
       },
     } = profile;
     return {
       auth_method: 1,
       name: username,
       user_auth_id: email,
+      age_range: has_age_range ? age_range : '없음',
     };
   }
 }
