@@ -48,10 +48,10 @@ type House {
   has_empty: Int
   is_crolled: Int
   board_date: Int
-  house_cost: House_cost!
+  house_cost: House_cost
   house_location: House_location!
   house_category: House_category!
-  region: Region!
+  region: Region
   imgs: [House_img]!
 }
 

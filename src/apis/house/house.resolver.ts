@@ -92,5 +92,4 @@ export class HouseResolver {
   async fetchCrawledHouses() {
     return await this.houseService.findAllCrawledHouses();
   }
-
 }

@@ -144,31 +144,32 @@ export class CrawlService {
             const uuid = v1();
             new Promise(async (resolve, reject) => {
               try {
-              const response = await this.httpService.axiosRef({
-                url: el,
-                method: 'GET',
-                responseType: 'stream',
-              });
-              //db에 이미지url삽입
-              this.dataSource.query(
-                'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
-                [
-                  'https://storage.googleapis.com/hasuk-storage/' +
-                    uuid +
-                    '.jpg',
-                  house_id,
-                ],
-              );
-
-              //storage에 저장
-              response.data
-                .pipe(storage.file(uuid + '.jpg').createWriteStream())
-                .on('finish', () => {
-                  resolve(`hasuk-storage/${uuid}.jpg`);
-                })
-                .on('error', () => {
-                  reject();
+                const response = await this.httpService.axiosRef({
+                  url: el,
+                  method: 'GET',
+                  responseType: 'stream',
                 });
+                //db에 이미지url삽입
+                this.dataSource.query(
+                  'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
+                  [
+                    'https://storage.googleapis.com/hasuk-storage/' +
+                      uuid +
+                      '.jpg',
+                    house_id,
+                  ],
+                );
+
+                //storage에 저장
+                response.data
+                  .pipe(storage.file(uuid + '.jpg').createWriteStream())
+                  .on('finish', () => {
+                    resolve(`hasuk-storage/${uuid}.jpg`);
+                  })
+                  .on('error', () => {
+                    reject();
+                  });
+
                 //db에 이미지url삽입
                 this.dataSource.query(
                   'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
@@ -207,7 +208,7 @@ export class CrawlService {
     name: 'crawl',
     timeZone: 'Asia/Seoul',
   })
-  async crawl({latestBoardDateByArg}) {
+  async crawl({ latestBoardDateByArg }) {
     console.log(
       '====================== Crawl init ===========================',
     );
