@@ -20,7 +20,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
       auth_method: 1,
       name: username,
       user_auth_id: email,
-      age_range: has_age_range ? age_range : '없음',
+      age_range: age_range ? age_range : '없음',
     };
   }
 }
