@@ -16,12 +16,7 @@ export class AuthController {
     private readonly userService: UserService,
   ) {}
 
-  // async register() {
-  //   // 1. 카카오 로그인
-  //   // 2. 카카오 로그인한 데이터 받아서 DB에 저장 (회원가입)
-  //   // 3. 로컬 액세스 토큰 + 리프레시 토큰 만들어서 반환
-  // }
-  @Get('/auth/login/kakao')
+  @Get('/api/auth/login/kakao')
   @UseGuards(AuthGuard('kakao'))
   async kakaoLogin(
     @Req() req: Request & IOauthUser, //
@@ -65,7 +60,7 @@ export class AuthController {
     );
   }
 
-  @Get('/auth/restore-access-token')
+  @Get('/api/auth/restore-access-token')
   @UseGuards(AuthGuard('restoreAccessToken'))
   async restoreAccessToken(
     @Req() req: Request & IOauthUser, //
