@@ -47,7 +47,7 @@ export class HouseService {
   }
   async findAllHousesByRegion({ region_id }) {
     let builder = await this.houseRepository.query(
-      "WITH H AS (SELECT tb_house.*, case JSON_ARRAYAGG(tb_house_img.img_url) WHEN '[null]' Then '[]' ELSE JSON_ARRAYAGG(tb_house_img.img_url) END AS img_urls FROM tb_house LEFT JOIN tb_house_img ON tb_house.id = tb_house_img.house_id  GROUP BY tb_house.id), T AS (SELECT H.*, tb_region.name AS region_name, tb_house_category.name AS category_name , tb_house_cost.month_cost, tb_main_spot.name AS nearest_main_spot_name, (POW(tb_main_spot_location.longitude - tb_house_location.longitude, 2) + POW(tb_main_spot_location.latitude - tb_house_location.latitude, 2)) AS mainSpotDistance FROM H, tb_house_location, tb_main_spot_location, tb_main_spot, tb_house_cost, tb_region, tb_house_category WHERE H.region_id = ? AND H.region_id = tb_region.id AND H.house_category_id = tb_house_category.id AND H.house_location_id = tb_house_location.id AND tb_main_spot.main_spot_location_id = tb_main_spot_location.id AND tb_house_cost.id = H.cost_id) SELECT  T.* from T, (SELECT id, MIN(mainSpotDistance) as nd from T group by T.id) AS T2 WHERE T.mainSpotDistance = T2.nd and T.id = T2.id;",
+      "WITH H AS (SELECT tb_house.*, case JSON_ARRAYAGG(tb_house_img.img_url) WHEN '[null]' Then '[]' ELSE JSON_ARRAYAGG(tb_house_img.img_url) END AS img_urls FROM tb_house LEFT JOIN tb_house_img ON tb_house.id = tb_house_img.house_id  GROUP BY tb_house.id), T AS (SELECT H.*, tb_region.name AS region_name, tb_house_category.name AS category_name , tb_house_cost.month_cost, tb_main_spot.name AS nearest_main_spot_name, (POW(tb_main_spot_location.longitude - tb_house_location.longitude, 2) + POW(tb_main_spot_location.latitude - tb_house_location.latitude, 2)) AS mainSpotDistance FROM tb_house_location, tb_main_spot_location, tb_main_spot, tb_house_category, (H LEFT JOIN tb_house_cost ON tb_house_cost.id = H.cost_id LEFT JOIN tb_region ON H.region_id = tb_region.id) WHERE H.region_id = ? AND H.house_category_id = tb_house_category.id AND H.house_location_id = tb_house_location.id AND tb_main_spot.main_spot_location_id = tb_main_spot_location.id) SELECT  T.* from T, (SELECT id, MIN(mainSpotDistance) as nd from T group by T.id) AS T2 WHERE T.mainSpotDistance = T2.nd and T.id = T2.id;",
 
       [region_id],
     );
@@ -337,7 +337,7 @@ export class HouseService {
         const uuid = v1();
         new Promise(async (resolve, reject) => {
           img_urls.push(
-            'https://storage.cloud.google.com/hasuk-storage/' + uuid + '.jpg',
+            'https://storage.googleapis.com/hasuk-storage/' + uuid + '.jpg',
           );
 
           el.createReadStream()
@@ -448,7 +448,7 @@ export class HouseService {
           const time = Date.now();
 
           img_urls.push(
-            'https://storage.cloud.google.com/hasuk-storage/' + time + '.jpg',
+            'https://storage.googleapis.com/hasuk-storage/' + time + '.jpg',
           );
 
           el.createReadStream()

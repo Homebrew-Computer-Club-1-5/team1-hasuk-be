@@ -9,21 +9,21 @@ import { Storage } from '@google-cloud/storage';
 import { v1 } from 'uuid';
 
 const boardInfos = [
-  {
-    board_name: '일반',
-    house_category_id: 1,
-    url: 'https://www.koreapas.com/bbs/zboard.php?category=1&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
-  },
-  {
-    board_name: '하숙',
-    house_category_id: 2,
-    url: 'https://www.koreapas.com/bbs/zboard.php?category=2&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
-  },
-  {
-    board_name: '자취/원룸',
-    house_category_id: 3,
-    url: 'https://www.koreapas.com/bbs/zboard.php?category=3&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
-  },
+  // {
+  //   board_name: '일반',
+  //   house_category_id: 1,
+  //   url: 'https://www.koreapas.com/bbs/zboard.php?category=1&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
+  // },
+  // {
+  //   board_name: '하숙',
+  //   house_category_id: 2,
+  //   url: 'https://www.koreapas.com/bbs/zboard.php?category=2&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
+  // },
+  // {
+  //   board_name: '자취/원룸',
+  //   house_category_id: 3,
+  //   url: 'https://www.koreapas.com/bbs/zboard.php?category=3&id=house&page=1&page_num=30&sn=off&ss=on&sc=on&keyword=&tagkeyword=&select_arrange=headnum&desc=asc',
+  // },
   {
     board_name: '고시원',
     house_category_id: 4,
@@ -112,61 +112,7 @@ export class CrawlService {
             [boardDate, house_id],
           );
         } else {
-          //3-2.크롤링 했던게 아니면 boardDate, other_info, imgs, isColled , (has_empty)
-          this.dataSource.query(
-            'UPDATE tb_house SET house_other_info = ?, has_empty = 1, is_crolled = 1, board_date = ?, house_category_id = ? WHERE id = ? and is_crolled != 1 ',
-            [otherInfo, boardDate, category_id, house_id],
-          );
-          this.dataSource.query(
-            'DELETE FROM tb_house_img WHERE house_id = ? ',
-            [house_id],
-          );
-
-          //이미지들 삽입
-
-          const storage = new Storage({
-            projectId: 'board-373207',
-            keyFilename: 'board-373207-a02f17b5865d.json',
-          }).bucket('hasuk-storage');
-
-          const results = await Promise.all(
-            homeImgUrls.map((el) => {
-              new Promise(async (resolve, reject) => {
-                try {
-                  const response = await this.httpService.axiosRef({
-                    url: el,
-                    method: 'GET',
-                    responseType: 'stream',
-                  });
-
-                  const time = Date.now();
-
-                  //db에 이미지url삽입
-                  this.dataSource.query(
-                    'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
-                    [
-                      'https://storage.cloud.google.com/hasuk-storage/' +
-                        time +
-                        '.jpg',
-                      house_id,
-                    ],
-                  );
-
-                  //storage에 저장
-                  response.data
-                    .pipe(storage.file(time + '.jpg').createWriteStream())
-                    .on('finish', () => {
-                      resolve(`hasuk-storage/${time}.jpg`);
-                    })
-                    .on('error', () => {
-                      reject();
-                    });
-                } catch (error) {
-                  console.log(error);
-                }
-              });
-            }),
-          );
+          //3-2.크롤링 했던게 아니면(사용자가 올린게시물이면) 가만히...
         }
       } else {
         //3. 전화번호가 없으면 insert
@@ -195,6 +141,7 @@ export class CrawlService {
 
         const results = await Promise.all(
           homeImgUrls.map((el) => {
+            const uuid = v1();
             new Promise(async (resolve, reject) => {
               try {
                 const response = await this.httpService.axiosRef({
@@ -202,12 +149,32 @@ export class CrawlService {
                   method: 'GET',
                   responseType: 'stream',
                 });
-                const uuid = v1();
                 //db에 이미지url삽입
                 this.dataSource.query(
                   'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
                   [
-                    'https://storage.cloud.google.com/hasuk-storage/' +
+                    'https://storage.googleapis.com/hasuk-storage/' +
+                      uuid +
+                      '.jpg',
+                    house_id,
+                  ],
+                );
+
+                //storage에 저장
+                response.data
+                  .pipe(storage.file(uuid + '.jpg').createWriteStream())
+                  .on('finish', () => {
+                    resolve(`hasuk-storage/${uuid}.jpg`);
+                  })
+                  .on('error', () => {
+                    reject();
+                  });
+
+                //db에 이미지url삽입
+                this.dataSource.query(
+                  'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
+                  [
+                    'https://storage.googleapis.com/hasuk-storage/' +
                       uuid +
                       '.jpg',
                     house_id,
@@ -241,7 +208,7 @@ export class CrawlService {
     name: 'crawl',
     timeZone: 'Asia/Seoul',
   })
-  async crawl() {
+  async crawl({ latestBoardDateByArg }) {
     console.log(
       '====================== Crawl init ===========================',
     );
@@ -260,7 +227,7 @@ export class CrawlService {
       // const latestBoardDate = 1674117774000;
       const result = await crawl(
         {
-          latestBoardDate: 1675335194000,
+          latestBoardDate: latestBoardDateByArg,
           contactNumberRegExp: /\d{2,3}(-|\.|\s*)\d{3,4}(-|\.|\s*)\d{3,4}/gm,
           boardUrl: boardInfo.url,
           house_category_id: boardInfo.house_category_id,

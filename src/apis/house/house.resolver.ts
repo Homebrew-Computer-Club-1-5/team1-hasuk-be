@@ -42,7 +42,6 @@ export class HouseResolver {
   async createHouse(
     @Args('createHouseInput') createHouseInput: CreateHouseInput,
     @ReqUser() reqUser: IreqUser,
-    // @GqlRes() res: Response,
   ) {
     console.log('유저 인가 완료', reqUser);
     // 1. 등록!!
@@ -82,11 +81,6 @@ export class HouseResolver {
     @Args('updateMyHouseInput') updateMyHouseInput: UpdateMyHouseInput,
     @ReqUser() reqUser: IreqUser,
   ) {
-    // const reqUser: IreqUser = {
-    //   user_auth_id: 'gunpol@naver.com',
-    //   name: '김건',
-    //   auth_method: 1,
-    // };
     const result2 = await this.houseService.update({
       updateMyHouseInput,
       reqUser,
