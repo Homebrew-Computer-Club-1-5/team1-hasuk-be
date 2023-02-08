@@ -2,7 +2,7 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { House } from '../../db_entity/house/entities/house.entity';
 import { Region } from '../../db_entity/region/entities/region.entity';
-import { fetchAllHousesOutput } from './dto/fetchAllHouses.output';
+import { fetchHousesByRegionOutput } from './dto/fetchHousesByRegion/fetchHousesByRegion.output';
 import { HouseService } from './house.service';
 import { GqlAuthAccessGuard } from 'src/common/auth/gql-auth.guard';
 import { ReqUser } from 'src/common/auth/gql-auth.param';
@@ -26,7 +26,7 @@ export class HouseResolver {
   }
 
   //특정부근의 집+가장가까운 주요지점 정보 가져오기
-  @Query(() => [fetchAllHousesOutput])
+  @Query(() => [fetchHousesByRegionOutput])
   fetchHousesByRegion(@Args('region_id') region_id: number) {
     return this.houseService.findAllHousesByRegion({ region_id });
   }
