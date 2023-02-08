@@ -77,7 +77,7 @@ type fetchAllHousesOutput {
   is_crolled: Int
   board_date: Int
   house_category: House_category!
-  month_cost: Int!
+  month_cost: Int
   img_urls: [String!]!
   nearest_main_spot_name: String!
   region_name: String!

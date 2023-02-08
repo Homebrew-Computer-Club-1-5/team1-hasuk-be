@@ -17,11 +17,13 @@ export class UserService {
     return result;
   }
 
-  async create({ user_auth_id, name, auth_method }) {
+  async create({ reqUser }) {
+    const { user_auth_id, name, auth_method, age_range } = reqUser;
     const result = await this.userRepository.save({
       user_auth_id,
       name,
       auth_method,
+      age_range,
     });
     return result;
   }

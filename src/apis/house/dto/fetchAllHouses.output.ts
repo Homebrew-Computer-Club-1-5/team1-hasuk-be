@@ -10,7 +10,7 @@ export class fetchAllHousesOutput extends OmitType(House, [
   'region',
   'imgs',
 ]) {
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   month_cost: number;
 
   @Field(() => [String])

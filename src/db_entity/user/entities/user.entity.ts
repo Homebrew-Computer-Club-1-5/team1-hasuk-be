@@ -28,6 +28,9 @@ export class User {
   // @Field(()=>String, {nullable : true})
   auth_method: number;
 
+  @Column({ type: 'varchar', length: '60' })
+  age_range: string;
+
   @JoinTable({
     name: 'tb_house_user',
     joinColumns: [{ name: 'user_id' }],

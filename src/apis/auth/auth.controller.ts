@@ -24,6 +24,7 @@ export class AuthController {
   ) {
     // 1. 카카오 로그인
     const { user_auth_id, name, auth_method } = req.user;
+    console.log(req.user);
     // 2. 카카오 로그인한 데이터 받아서 DB에서 검색
     const findOneUserResult = await this.userService.findOne({
       user_auth_id,
@@ -31,14 +32,11 @@ export class AuthController {
       auth_method,
     });
     //// 1). 유저 존재하는경우 : 3단계로 바로 넘어감
-    if (findOneUserResult)
-      console.log(`기 가입된 ${findOneUserResult.name}유저 로그인`);
+    if (findOneUserResult) console.log(`${findOneUserResult.name}유저 로그인`);
     //// 2). 유저 존재하지 않는 경우 : 카카오 로그인한 데이터 DB에 저장 (회원가입)
     if (!findOneUserResult) {
       const createUserResult = await this.userService.create({
-        user_auth_id,
-        name,
-        auth_method,
+        reqUser: req.user,
       });
       if (createUserResult) {
         console.log(`${createUserResult.name}유저 회원가입 완료`);

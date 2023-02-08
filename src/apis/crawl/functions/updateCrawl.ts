@@ -18,11 +18,30 @@ export default async function updateCrawl(
   outer: while (!isOld) {
     inner: for (let i = 0; i < 30; i++) {
       // console.log('페이지 접속중');
-      await page.waitForSelector(
-        `#revolution_main_table > tbody > tr:nth-child(${
-          2 * i + 3
-        }) > td:nth-child(4) > a`,
-      );
+      let selectorAppeared = false;
+
+      while (!selectorAppeared) {
+        try {
+          await page.waitForSelector(
+            `#revolution_main_table > tbody > tr:nth-child(${
+              2 * i + 3
+            }) > td:nth-child(4) > a`,
+          );
+          selectorAppeared = true;
+        } catch (error) {
+          if (
+            error.message.includes('timeout') ||
+            error.message.includes('Waiting')
+          ) {
+            console.log('Timeout error, re-trying...');
+            page.reload({ waitUntil: 'domcontentloaded' });
+          } else {
+            console.log(error.message);
+            throw error;
+          }
+        }
+      }
+      selectorAppeared = false;
       const isAnnouncement = await page.evaluate(
         (selector) => document.querySelector(selector) !== null,
         `#revolution_main_table > tbody > tr:nth-child(${
@@ -30,15 +49,34 @@ export default async function updateCrawl(
         }) >td:nth-child(1)>span`,
       );
       if (!isAnnouncement) {
-        const response = await Promise.all([
-          page.waitForNavigation(),
-          page.click(
-            `#revolution_main_table > tbody > tr:nth-child(${
-              2 * i + 3
-            }) > td:nth-child(4) > a`,
-          ),
-        ]);
-        // console.log('접속완료');
+        ///
+        let navigationCompleted = false;
+
+        while (!navigationCompleted) {
+          try {
+            const response = await Promise.all([
+              page.waitForNavigation(),
+              page.click(
+                `#revolution_main_table > tbody > tr:nth-child(${
+                  2 * i + 3
+                }) > td:nth-child(4) > a`,
+              ),
+            ]);
+            navigationCompleted = true;
+          } catch (error) {
+            if (
+              error.message.includes('timeout') ||
+              error.message.includes('Navigation')
+            ) {
+              console.log('Timeout error, re-trying...');
+              page.reload({ waitUntil: 'domcontentloaded' });
+            } else {
+              console.log(error.message);
+              throw error;
+            }
+          }
+        }
+        ///
 
         // 정보들 크롤링 해서 객체에 담기
         // boardDate, boardId
@@ -47,9 +85,28 @@ export default async function updateCrawl(
 
         // "~시간 전" 이 없는 게시물일경우 +1씩
         // 검증
-        await page.waitForSelector(
-          'body > div > div:nth-child(7) > div > table:nth-child(13) > tbody > tr > td:nth-child(2) > span:nth-child(4)',
-        );
+        while (!selectorAppeared) {
+          try {
+            await page.waitForSelector(
+              'body > div > div:nth-child(7) > div > table:nth-child(13) > tbody > tr > td:nth-child(2) > span:nth-child(4)',
+            );
+
+            selectorAppeared = true;
+          } catch (error) {
+            if (
+              error.message.includes('timeout') ||
+              error.message.includes('Waiting')
+            ) {
+              console.log('Timeout error, re-trying...');
+              page.reload({ waitUntil: 'domcontentloaded' });
+            } else {
+              console.log(error.message);
+              throw error;
+            }
+          }
+        }
+        selectorAppeared = false;
+
         const isRecentText = await page.$eval(
           'body > div > div:nth-child(7) > div > table:nth-child(13) > tbody > tr > td:nth-child(2) > span:nth-child(4)',
           (element) => element.textContent,
@@ -62,9 +119,27 @@ export default async function updateCrawl(
 
         // boardDate 크롤링 + 정제
         // 크롤링
-        await page.waitForSelector(
-          `body > div > div:nth-child(7) > div > table:nth-child(13) > tbody > tr > td:nth-child(2) > span:nth-child(${boardDateSelector})`,
-        );
+        while (!selectorAppeared) {
+          try {
+            await page.waitForSelector(
+              `body > div > div:nth-child(7) > div > table:nth-child(13) > tbody > tr > td:nth-child(2) > span:nth-child(${boardDateSelector})`,
+            );
+
+            selectorAppeared = true;
+          } catch (error) {
+            if (
+              error.message.includes('timeout') ||
+              error.message.includes('Waiting')
+            ) {
+              console.log('Timeout error, re-trying...');
+              page.reload({ waitUntil: 'domcontentloaded' });
+            } else {
+              console.log(error.message);
+              throw error;
+            }
+          }
+        }
+        selectorAppeared = false;
         let boardDate = await page.$eval(
           `body > div > div:nth-child(7) > div > table:nth-child(13) > tbody > tr > td:nth-child(2) > span:nth-child(${boardDateSelector})`,
           (element) => element.textContent as string,
@@ -93,9 +168,27 @@ export default async function updateCrawl(
         }
         // boardId 크롤링 + 정제
         // 크롤링
-        await page.waitForSelector(
-          `body > div > div:nth-child(7) > div > table:nth-child(13) > tbody > tr > td:nth-child(2) > span:nth-child(${boardIdSelector})`,
-        );
+        while (!selectorAppeared) {
+          try {
+            await page.waitForSelector(
+              `body > div > div:nth-child(7) > div > table:nth-child(13) > tbody > tr > td:nth-child(2) > span:nth-child(${boardIdSelector})`,
+            );
+
+            selectorAppeared = true;
+          } catch (error) {
+            if (
+              error.message.includes('timeout') ||
+              error.message.includes('Waiting')
+            ) {
+              console.log('Timeout error, re-trying...');
+              page.reload({ waitUntil: 'domcontentloaded' });
+            } else {
+              console.log(error.message);
+              throw error;
+            }
+          }
+        }
+        selectorAppeared = false;
         let boardId = await page.$eval(
           `body > div > div:nth-child(7) > div > table:nth-child(13) > tbody > tr > td:nth-child(2) > span:nth-child(${boardIdSelector})`,
           (element) => element.textContent as string,
@@ -110,9 +203,28 @@ export default async function updateCrawl(
         const barIndex = boardId.indexOf('|') - 1;
         boardId = boardId.slice(firstNumberIndex, barIndex);
         // 게시글 - otherInfo
-        await page.waitForSelector(
-          '#bonmoon > tbody > tr:nth-child(1) > td > div',
-        );
+        while (!selectorAppeared) {
+          try {
+            await page.waitForSelector(
+              '#bonmoon > tbody > tr:nth-child(1) > td > div',
+            );
+
+            selectorAppeared = true;
+          } catch (error) {
+            if (
+              error.message.includes('timeout') ||
+              error.message.includes('Waiting')
+            ) {
+              console.log('Timeout error, re-trying...');
+              page.reload({ waitUntil: 'domcontentloaded' });
+            } else {
+              console.log(error.message);
+
+              throw error;
+            }
+          }
+        }
+        selectorAppeared = false;
         let otherInfo = await page.$eval(
           '#bonmoon > tbody > tr:nth-child(1) > td > div',
           (element) => element.textContent as string,
@@ -161,14 +273,33 @@ export default async function updateCrawl(
       'body > div > div:nth-child(7) > div > form > table:nth-child(14) > tbody > tr > td.nanum-g > span:nth-child(11) > a:nth-child(2)',
     );
     // 다음페이지 넘어가고, 로드될때까지 기다리기
-    await Promise.all([
-      page.waitForNavigation(),
-      page.click(
-        `body > div > div:nth-child(7) > div > form > table:nth-child(14) > tbody > tr > td.nanum-g > span:nth-child(${
-          isFirstPage ? 11 : 12
-        }) > a:nth-child(2)`,
-      ),
-    ]);
+
+    let navigationCompleted = false;
+
+    while (!navigationCompleted) {
+      try {
+        await Promise.all([
+          page.waitForNavigation(),
+          page.click(
+            `body > div > div:nth-child(7) > div > form > table:nth-child(14) > tbody > tr > td.nanum-g > span:nth-child(${
+              isFirstPage ? 11 : 12
+            }) > a:nth-child(2)`,
+          ),
+        ]);
+        navigationCompleted = true;
+      } catch (error) {
+        if (
+          error.message.includes('timeout') ||
+          error.message.includes('Navigation')
+        ) {
+          console.log('Timeout error, re-trying...');
+          page.reload({ waitUntil: 'domcontentloaded' });
+        } else {
+          console.log(error.message);
+          throw error;
+        }
+      }
+    }
   }
   return boardCrawledDatas;
 }

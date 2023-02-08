@@ -41,7 +41,7 @@ export class HouseService {
 
   async findAllHouses() {
     const result = await this.regionRepository.find({
-      relations: ['houses', 'houses.house_location'],
+      relations: ['houses', 'houses.house_location', 'houses.house_category'],
     });
     return result;
   }
@@ -336,18 +336,22 @@ export class HouseService {
       waitedFiles.map((el) => {
         const uuid = v1();
         new Promise(async (resolve, reject) => {
-          img_urls.push(
-            'https://storage.googleapis.com/hasuk-storage/' + uuid + '.jpg',
-          );
+          try {
+            img_urls.push(
+              'https://storage.googleapis.com/hasuk-storage/' + uuid + '.jpg',
+            );
 
-          el.createReadStream()
-            .pipe(storage.file(uuid + '.jpg').createWriteStream())
-            .on('finish', () => {
-              resolve(`hasuk-storage/${uuid}.jpg`);
-            })
-            .on('error', () => {
-              reject();
-            });
+            el.createReadStream()
+              .pipe(storage.file(uuid + '.jpg').createWriteStream())
+              .on('finish', () => {
+                resolve(`hasuk-storage/${uuid}.jpg`);
+              })
+              .on('error', () => {
+                reject();
+              });
+          } catch (error) {
+            console.log(error);
+          }
         });
       }),
     );
@@ -444,21 +448,24 @@ export class HouseService {
 
     await Promise.all(
       waitedFiles.map((el) => {
+        const uuid = v1();
         new Promise(async (resolve, reject) => {
-          const time = Date.now();
+          try {
+            img_urls.push(
+              'https://storage.googleapis.com/hasuk-storage/' + uuid + '.jpg',
+            );
 
-          img_urls.push(
-            'https://storage.googleapis.com/hasuk-storage/' + time + '.jpg',
-          );
-
-          el.createReadStream()
-            .pipe(storage.file(time + '.jpg').createWriteStream())
-            .on('finish', () => {
-              resolve(`hasuk-storage/${time}.jpg`);
-            })
-            .on('error', () => {
-              reject();
-            });
+            el.createReadStream()
+              .pipe(storage.file(uuid + '.jpg').createWriteStream())
+              .on('finish', () => {
+                resolve(`hasuk-storage/${uuid}.jpg`);
+              })
+              .on('error', () => {
+                reject();
+              });
+          } catch (error) {
+            console.log(error);
+          }
         });
       }),
     );
