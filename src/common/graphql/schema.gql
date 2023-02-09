@@ -47,7 +47,7 @@ type House {
   house_other_info: String
   has_empty: Int
   is_crolled: Int
-  board_date: Int
+  board_date: String
   house_cost: House_cost
   house_location: House_location!
   house_category: House_category!
@@ -75,7 +75,7 @@ type fetchHousesByRegionOutput {
   house_other_info: String
   has_empty: Int
   is_crolled: Int
-  board_date: Int
+  board_date: String
   house_category: House_category!
   month_cost: Int
   img_urls: [String!]!
@@ -114,6 +114,62 @@ type FetchCrawledHousesOutput {
   house_category: Int!
 }
 
+type CategoryOutput {
+  id: Int!
+  name: String!
+}
+
+type ImgOutput {
+  id: Int!
+  img_url: String!
+}
+
+type RegionOutput {
+  id: Int!
+  name: String
+}
+
+type FetchHouseOutput {
+  id: Int!
+  contact_number: String
+  gender: Int
+  house_other_info: String
+  has_empty: Int
+  is_crolled: Int
+  board_date: String
+  house_cost: House_cost
+  house_location: House_location!
+  house_category: CategoryOutput!
+  region: RegionOutput!
+  imgs: [ImgOutput!]!
+}
+
+type HouseOutput {
+  id: Int!
+  contact_number: String
+  gender: Int
+  house_other_info: String
+  has_empty: Int
+  is_crolled: Int
+  board_date: String
+  house_cost: House_cost
+  house_location: House_location!
+  house_category: CategoryOutput!
+  imgs: [ImgOutput!]!
+}
+
+type UniversitiyOutput {
+  id: Int!
+  name: String!
+}
+
+type fetchAllHousesOutput {
+  id: Int!
+  name: String
+  universities: UniversitiyOutput!
+  houses: HouseOutput!
+}
+
 type Main_spot_locationOutput {
   id: Int!
   latitude: Float!
@@ -128,9 +184,9 @@ type FetchMainSpotsOutput {
 
 type Query {
   fetchMainSpots: [FetchMainSpotsOutput!]!
-  fetchAllHouses: [Region!]!
+  fetchAllHouses: [fetchAllHousesOutput!]!
   fetchHousesByRegion(region_id: Float!): [fetchHousesByRegionOutput!]!
-  fetchHouse(house_id: Float!): House!
+  fetchHouse(house_id: Float!): FetchHouseOutput!
   fetchHouseByLocation(location: House_locationInput!): House_location!
   fetchMyHouse: [FetchMyHouseOutput!]!
   fetchCrawledHouses: [FetchCrawledHousesOutput!]!

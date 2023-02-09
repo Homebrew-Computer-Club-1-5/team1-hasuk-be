@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import {
   ManyToOne,
   JoinColumn,
@@ -46,7 +46,7 @@ export class House {
   is_crolled: number;
 
   @Column({ type: 'bigint', nullable: true })
-  @Field(() => Int, { nullable: true })
+  @Field(() => String, { nullable: true })
   board_date: number;
 
   @OneToOne(() => House_cost)
