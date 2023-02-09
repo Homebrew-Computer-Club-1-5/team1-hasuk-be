@@ -68,7 +68,7 @@ type Main_spot {
   main_spot_location: Main_spot_location!
 }
 
-type fetchAllHousesOutput {
+type fetchHousesByRegionOutput {
   id: Int!
   contact_number: String
   gender: Int
@@ -114,10 +114,22 @@ type FetchCrawledHousesOutput {
   house_category: Int!
 }
 
+type Main_spot_locationOutput {
+  id: Int!
+  latitude: Float!
+  longitude: Float!
+}
+
+type FetchMainSpotsOutput {
+  id: Int!
+  name: String!
+  main_spot_location: Main_spot_locationOutput!
+}
+
 type Query {
-  fetchMainSpots: [Main_spot!]!
+  fetchMainSpots: [FetchMainSpotsOutput!]!
   fetchAllHouses: [Region!]!
-  fetchHousesByRegion(region_id: Float!): [fetchAllHousesOutput!]!
+  fetchHousesByRegion(region_id: Float!): [fetchHousesByRegionOutput!]!
   fetchHouse(house_id: Float!): House!
   fetchHouseByLocation(location: House_locationInput!): House_location!
   fetchMyHouse: [FetchMyHouseOutput!]!
