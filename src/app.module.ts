@@ -35,6 +35,8 @@ import { UserModule } from './apis/user/user.module';
       entities: [__dirname + '/db_entity/**/*.entity.*'],
       synchronize: true,
       logging: false,
+      bigNumberStrings: false,
+      supportBigNumbers: true,
     }),
     ScheduleModule.forRoot(),
     AuthModule,
