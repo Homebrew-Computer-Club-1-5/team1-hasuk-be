@@ -14,13 +14,15 @@ import { FetchMyHouseOutput } from './dto/fetchMyHouse/fetchMyHouse.output';
 import { UpdateMyHouseInput } from './dto/updateMyHouse/updateMyHouse.input';
 import { FetchCrawledHousesOutput } from './dto/fetchCrawledHouses/fetchCrawledHouses.output';
 import { House_img } from 'src/db_entity/house_img/entities/house_img.entity';
+import { FetchHouseOutput } from './dto/fetchHouse/fetchHouse.output';
+import { fetchAllHousesOutput } from './dto/fetchAllHouses/fetchAllHouses.output';
 
 @Resolver()
 export class HouseResolver {
   constructor(private readonly houseService: HouseService) {}
 
   //모든부근의 모든 집 정보를 가져오기
-  @Query(() => [Region])
+  @Query(() => [fetchAllHousesOutput])
   fetchAllHouses() {
     return this.houseService.findAllHouses();
   }
@@ -32,7 +34,7 @@ export class HouseResolver {
   }
 
   //특정 집 정보 가져오기
-  @Query(() => House)
+  @Query(() => FetchHouseOutput)
   fetchHouse(@Args('house_id') house_id: number) {
     return this.houseService.findHouse({ house_id });
   }
