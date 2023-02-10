@@ -47,7 +47,7 @@ type House {
   house_other_info: String
   has_empty: Int
   is_crolled: Int
-  board_date: Int
+  board_date: Float
   house_cost: House_cost
   house_location: House_location!
   house_category: House_category!
@@ -75,13 +75,13 @@ type fetchHousesByRegionOutput {
   house_other_info: String
   has_empty: Int
   is_crolled: Int
-  board_date: Int
   house_category: House_category!
   month_cost: Int
   img_urls: [String!]!
   nearest_main_spot_name: String!
   region_name: String!
   house_category_id: Int!
+  board_date: String!
 }
 
 type House_locationExceptId {
@@ -128,9 +128,10 @@ type FetchMainSpotsOutput {
 
 type Query {
   fetchMainSpots: [FetchMainSpotsOutput!]!
-  fetchAllHouses: [Region!]!
+  fetchAllHousesGroupedByRegion: [Region!]!
   fetchHousesByRegion(region_id: Float!): [fetchHousesByRegionOutput!]!
   fetchHouse(house_id: Float!): House!
+  fetchAllHouses: [House!]!
   fetchHouseByLocation(location: House_locationInput!): House_location!
   fetchMyHouse: [FetchMyHouseOutput!]!
   fetchCrawledHouses: [FetchCrawledHousesOutput!]!

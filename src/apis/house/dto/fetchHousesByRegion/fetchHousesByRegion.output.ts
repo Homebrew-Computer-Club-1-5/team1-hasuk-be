@@ -9,6 +9,7 @@ export class fetchHousesByRegionOutput extends OmitType(House, [
   'house_location',
   'region',
   'imgs',
+  'board_date',
 ]) {
   @Field(() => Int, { nullable: true })
   month_cost: number;
@@ -24,4 +25,8 @@ export class fetchHousesByRegionOutput extends OmitType(House, [
 
   @Field(() => Int)
   house_category_id: number;
+
+  // 임시
+  @Field(() => String)
+  board_date: string;
 }
