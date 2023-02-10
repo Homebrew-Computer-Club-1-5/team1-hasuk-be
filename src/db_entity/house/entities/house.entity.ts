@@ -46,7 +46,7 @@ export class House {
   is_crolled: number;
 
   @Column({ type: 'bigint', nullable: true })
-  @Field(() => String, { nullable: true })
+  @Field(() => Float, { nullable: true })
   board_date: number;
 
   @OneToOne(() => House_cost)

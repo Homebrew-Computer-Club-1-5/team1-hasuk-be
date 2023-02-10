@@ -22,9 +22,10 @@ export class HouseResolver {
   constructor(private readonly houseService: HouseService) {}
 
   //모든부근의 모든 집 정보를 가져오기
+
   @Query(() => [fetchAllHousesOutput])
-  fetchAllHouses() {
-    return this.houseService.findAllHouses();
+  fetchAllHousesGroupedByRegion() {
+    return this.houseService.findAllHousesGroupedByRegion();
   }
 
   //특정부근의 집+가장가까운 주요지점 정보 가져오기
@@ -37,6 +38,11 @@ export class HouseResolver {
   @Query(() => FetchHouseOutput)
   fetchHouse(@Args('house_id') house_id: number) {
     return this.houseService.findHouse({ house_id });
+  }
+
+  @Query(() => [House])
+  async fetchAllHouses() {
+    return this.houseService.findAllHouses();
   }
 
   @UseGuards(GqlAuthAccessGuard)

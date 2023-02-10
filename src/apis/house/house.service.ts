@@ -39,12 +39,24 @@ export class HouseService {
     private dataSource: DataSource,
   ) {}
 
-  async findAllHouses() {
+  async findAllHousesGroupedByRegion() {
     const result = await this.regionRepository.find({
       relations: ['houses', 'houses.house_location', 'houses.house_category'],
     });
     return result;
   }
+
+  async findAllHouses() {
+    const result = await this.houseRepository.find({
+      relations: ['region', 'house_cost', 'imgs', 'house_category'],
+    });
+    const result2 = result.map((each) => {
+      each.board_date = parseInt(each.board_date as any);
+      return each;
+    });
+    return result2;
+  }
+
   async findAllHousesByRegion({ region_id }) {
     let builder = await this.houseRepository.query(
       "WITH H AS (SELECT tb_house.*, case JSON_ARRAYAGG(tb_house_img.img_url) WHEN '[null]' Then '[]' ELSE JSON_ARRAYAGG(tb_house_img.img_url) END AS img_urls FROM tb_house LEFT JOIN tb_house_img ON tb_house.id = tb_house_img.house_id  GROUP BY tb_house.id), T AS (SELECT H.*, tb_region.name AS region_name, tb_house_category.name AS category_name , tb_house_cost.month_cost, tb_main_spot.name AS nearest_main_spot_name, (POW(tb_main_spot_location.longitude - tb_house_location.longitude, 2) + POW(tb_main_spot_location.latitude - tb_house_location.latitude, 2)) AS mainSpotDistance FROM tb_house_location, tb_main_spot_location, tb_main_spot, tb_house_category, (H LEFT JOIN tb_house_cost ON tb_house_cost.id = H.cost_id LEFT JOIN tb_region ON H.region_id = tb_region.id) WHERE H.region_id = ? AND H.house_category_id = tb_house_category.id AND H.house_location_id = tb_house_location.id AND tb_main_spot.main_spot_location_id = tb_main_spot_location.id) SELECT  T.* from T, (SELECT id, MIN(mainSpotDistance) as nd from T group by T.id) AS T2 WHERE T.mainSpotDistance = T2.nd and T.id = T2.id;",
