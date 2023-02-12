@@ -11,13 +11,13 @@ services:
       - ./.env.dev
     ports:
       - 8000:8080
-  mysql:
-    image: mysql:8.0
-    ports:
-      - 3307:3306
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    environment:
-      - MYSQL_DATABASE=test1
-      - MYSQL_ROOT_PASSWORD=1234
+  # mysql:
+  #   image: mysql:8.0
+  #   ports:
+  #     - 3307:3306
+  #   command:
+  #     - --character-set-server=utf8mb4
+  #     - --collation-server=utf8mb4_unicode_ci
+  #   environment:
+  #     - MYSQL_DATABASE=test1
+  #     - MYSQL_ROOT_PASSWORD=1234

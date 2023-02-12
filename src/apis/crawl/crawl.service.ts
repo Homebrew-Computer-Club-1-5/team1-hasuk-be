@@ -137,7 +137,7 @@ export class CrawlService {
         const storage = new Storage({
           projectId: 'board-373207',
           keyFilename: 'board-373207-a02f17b5865d.json',
-        }).bucket('hasuk-test-storage');
+        }).bucket(process.env.STORAGE);
 
         const results = await Promise.all(
           homeImgUrls.map((el) => {
@@ -153,7 +153,9 @@ export class CrawlService {
                 this.dataSource.query(
                   'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
                   [
-                    'https://storage.googleapis.com/hasuk-test-storage/' +
+                    'https://storage.googleapis.com/' +
+                      process.env.STORAGE +
+                      '/' +
                       uuid +
                       '.jpg',
                     house_id,
@@ -164,7 +166,7 @@ export class CrawlService {
                 response.data
                   .pipe(storage.file(uuid + '.jpg').createWriteStream())
                   .on('finish', () => {
-                    resolve(`hasuk-test-storage/${uuid}.jpg`);
+                    resolve(`${process.env.STORAGE}/${uuid}.jpg`);
                   })
                   .on('error', () => {
                     reject();
@@ -174,7 +176,9 @@ export class CrawlService {
                 this.dataSource.query(
                   'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
                   [
-                    'https://storage.googleapis.com/hasuk-test-storage/' +
+                    'https://storage.googleapis.com/' +
+                      process.env.STORAGE +
+                      '/' +
                       uuid +
                       '.jpg',
                     house_id,
@@ -185,7 +189,7 @@ export class CrawlService {
                 response.data
                   .pipe(storage.file(uuid + '.jpg').createWriteStream())
                   .on('finish', () => {
-                    resolve(`hasuk-test-storage/${uuid}.jpg`);
+                    resolve(`${process.env.STORAGE}/${uuid}.jpg`);
                   })
                   .on('error', () => {
                     reject();
