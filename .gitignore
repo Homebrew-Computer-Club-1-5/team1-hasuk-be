@@ -1,5 +1,2 @@
 node_modules/
 dist/
-.env
-.env.docker
-board-373207-a02f17b5865d.json
