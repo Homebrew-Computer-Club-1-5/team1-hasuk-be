@@ -16,6 +16,7 @@ import { FetchCrawledHousesOutput } from './dto/fetchCrawledHouses/fetchCrawledH
 import { House_img } from 'src/db_entity/house_img/entities/house_img.entity';
 import { FetchHouseOutput } from './dto/fetchHouse/fetchHouse.output';
 import { fetchAllHousesOutput } from './dto/fetchAllHouses/fetchAllHouses.output';
+import { FetchUpOutput } from './dto/fetchUp/fetchUp.output';
 
 @Resolver()
 export class HouseResolver {
@@ -57,11 +58,10 @@ export class HouseResolver {
       createHouseInput,
       reqUser,
     });
-    console.log(result2);
     return result2;
   }
 
-  @Query(() => House_location)
+  @Query(() => Number) // house_id 를 리턴
   async fetchHouseByLocation(@Args('location') location: House_locationInput) {
     return await this.houseService.findHouseByLocation({ location });
   }
@@ -69,7 +69,6 @@ export class HouseResolver {
   @UseGuards(GqlAuthAccessGuard)
   @Query(() => [FetchMyHouseOutput])
   async fetchMyHouse(@ReqUser() reqUser: IreqUser) {
-    console.log('fetchMyHouse실행');
     return await this.houseService.findMyHouses({ reqUser });
   }
 
@@ -83,15 +82,12 @@ export class HouseResolver {
     return result;
   }
 
-  @UseGuards(GqlAuthAccessGuard)
   @Mutation(() => Int)
   async updateMyHouse(
     @Args('updateMyHouseInput') updateMyHouseInput: UpdateMyHouseInput,
-    @ReqUser() reqUser: IreqUser,
   ) {
     const result2 = await this.houseService.update({
       updateMyHouseInput,
-      reqUser,
     });
     return result2;
   }

@@ -17,12 +17,13 @@ import { House_img } from '../../house_img/entities/house_img.entity';
 import { House_location } from '../../house_location/entities/house_location.entity';
 import { Region } from '../../region/entities/region.entity';
 import { User } from '../../user/entities/user.entity';
+import { Up } from 'src/db_entity/up/entities/up.entity';
 
 @ObjectType()
 @Entity({ name: 'tb_house' })
 export class House {
   @PrimaryGeneratedColumn('increment')
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   id: number;
 
   @Column({ nullable: true })
@@ -61,7 +62,7 @@ export class House {
 
   @ManyToOne(() => House_category)
   @JoinColumn({ name: 'house_category_id' })
-  @Field(() => House_category)
+  @Field(() => House_category, { nullable: true })
   house_category: House_category;
 
   @ManyToOne(() => Region)
@@ -80,6 +81,10 @@ export class House {
   })
   @ManyToMany(() => User, (user) => user.houses)
   users: User[];
+
+  @OneToMany(() => Up, (ups) => ups.house)
+  @Field(() => [Up], { nullable: 'items' })
+  ups: Up[];
 
   @DeleteDateColumn({ type: 'timestamp' })
   deletedAt!: number | null;

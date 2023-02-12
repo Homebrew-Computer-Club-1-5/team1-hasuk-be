@@ -12,6 +12,7 @@ import { HouseResolver } from './house.resolver';
 import { HouseService } from './house.service';
 import { House_location } from '../../db_entity/house_location/entities/house_location.entity';
 import { HttpModule } from '@nestjs/axios';
+import { Up } from 'src/db_entity/up/entities/up.entity';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { HttpModule } from '@nestjs/axios';
       House_img,
       User,
       House_location,
+      Up,
     ]),
     JwtAccessStrategy,
     HttpModule,

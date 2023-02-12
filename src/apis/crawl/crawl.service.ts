@@ -137,7 +137,7 @@ export class CrawlService {
         const storage = new Storage({
           projectId: 'board-373207',
           keyFilename: 'board-373207-a02f17b5865d.json',
-        }).bucket('hasuk-storage');
+        }).bucket('hasuk-test-storage');
 
         const results = await Promise.all(
           homeImgUrls.map((el) => {
@@ -153,7 +153,7 @@ export class CrawlService {
                 this.dataSource.query(
                   'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
                   [
-                    'https://storage.googleapis.com/hasuk-storage/' +
+                    'https://storage.googleapis.com/hasuk-test-storage/' +
                       uuid +
                       '.jpg',
                     house_id,
@@ -164,7 +164,7 @@ export class CrawlService {
                 response.data
                   .pipe(storage.file(uuid + '.jpg').createWriteStream())
                   .on('finish', () => {
-                    resolve(`hasuk-storage/${uuid}.jpg`);
+                    resolve(`hasuk-test-storage/${uuid}.jpg`);
                   })
                   .on('error', () => {
                     reject();
@@ -174,7 +174,7 @@ export class CrawlService {
                 this.dataSource.query(
                   'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
                   [
-                    'https://storage.googleapis.com/hasuk-storage/' +
+                    'https://storage.googleapis.com/hasuk-test-storage/' +
                       uuid +
                       '.jpg',
                     house_id,
@@ -185,7 +185,7 @@ export class CrawlService {
                 response.data
                   .pipe(storage.file(uuid + '.jpg').createWriteStream())
                   .on('finish', () => {
-                    resolve(`hasuk-storage/${uuid}.jpg`);
+                    resolve(`hasuk-test-storage/${uuid}.jpg`);
                   })
                   .on('error', () => {
                     reject();

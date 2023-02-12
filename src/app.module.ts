@@ -11,6 +11,7 @@ import { MainSpotModule } from './apis/mainSpot/mainSpot.module';
 import { CrawlModule } from './apis/crawl/crawl.module';
 import { AuthModule } from './apis/auth/auth.module';
 import { UserModule } from './apis/user/user.module';
+import { UpModule } from './apis/up/up.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { UserModule } from './apis/user/user.module';
     ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
+    UpModule,
   ],
 })
 export class AppModule {}

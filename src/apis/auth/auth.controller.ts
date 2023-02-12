@@ -24,7 +24,6 @@ export class AuthController {
   ) {
     // 1. 카카오 로그인
     const { user_auth_id, name, auth_method } = req.user;
-    console.log(req.user);
     // 2. 카카오 로그인한 데이터 받아서 DB에서 검색
     const findOneUserResult = await this.userService.findOne({
       user_auth_id,

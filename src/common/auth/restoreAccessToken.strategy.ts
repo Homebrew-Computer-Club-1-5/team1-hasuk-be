@@ -17,7 +17,6 @@ export class RestoreAcessToken extends PassportStrategy(
     super({
       jwtFromRequest: (req) => {
         const cookie = req.headers.cookie;
-        console.log(cookie);
         const refreshToken = getRefreshTokenFromCookies(cookie);
         return refreshToken;
       },
@@ -26,7 +25,6 @@ export class RestoreAcessToken extends PassportStrategy(
   }
 
   validate(payload) {
-    console.log(payload);
     return {
       user_auth_id: payload.user_auth_id,
       auth_method: payload.auth_method,
