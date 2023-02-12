@@ -153,7 +153,9 @@ export class CrawlService {
                 this.dataSource.query(
                   'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
                   [
-                    'https://storage.googleapis.com/'+ process.env.STORAGE+'/' +
+                    'https://storage.googleapis.com/' +
+                      process.env.STORAGE +
+                      '/' +
                       uuid +
                       '.jpg',
                     house_id,
@@ -174,7 +176,9 @@ export class CrawlService {
                 this.dataSource.query(
                   'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
                   [
-                    'https://storage.googleapis.com/'+ process.env.STORAGE+'/' +
+                    'https://storage.googleapis.com/' +
+                      process.env.STORAGE +
+                      '/' +
                       uuid +
                       '.jpg',
                     house_id,

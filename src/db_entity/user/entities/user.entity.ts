@@ -1,4 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Up } from 'src/db_entity/up/entities/up.entity';
 import {
   ManyToMany,
   Column,
@@ -9,23 +10,23 @@ import {
 } from 'typeorm';
 import { House } from '../../house/entities/house.entity';
 
-// @ObjectType()
+@ObjectType()
 @Entity({ name: 'tb_user' })
 export class User {
   @PrimaryGeneratedColumn('increment')
-  // @Field(()=>Int)
+  @Field(() => Int)
   id: number;
 
   @Column({ type: 'varchar', length: '60' })
-  // @Field(()=>String, {nullable : true})
+  @Field(() => String, { nullable: true })
   user_auth_id: string;
 
   @Column({ type: 'varchar', length: '60' })
-  // @Field(()=>String, {nullable : true})
+  @Field(() => String, { nullable: true })
   name: string;
 
   @Column({ type: 'tinyint' })
-  // @Field(()=>String, {nullable : true})
+  @Field(() => Int, { nullable: true })
   auth_method: number;
 
   @Column({ type: 'varchar', length: '60' })
@@ -37,6 +38,10 @@ export class User {
     inverseJoinColumns: [{ name: 'house_id' }],
   })
   @ManyToMany(() => House, (house) => house.users)
-  // @Field(()=>[University])
+  @Field(() => [House])
   houses: House[];
+
+  @OneToMany(() => Up, (ups) => ups.user)
+  @Field(() => [Up], { nullable: 'items' })
+  ups: Up[];
 }

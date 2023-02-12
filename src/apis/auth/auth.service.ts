@@ -16,7 +16,6 @@ export class AuthService {
 
   async makeTokens({ user_auth_id, auth_method }, res: Response | undefined) {
     // 리프레시 토큰 만들고, 헤더 셋팅
-    console.log(1);
     const refreshToken = this.jwtService.sign(
       { user_auth_id, auth_method },
       { secret: 'jwtRefreshStrategyKey', expiresIn: '2w' },
@@ -35,7 +34,6 @@ export class AuthService {
       { user_auth_id, auth_method },
       { secret: 'jwtAccessStrategyKey', expiresIn: '2h' },
     );
-    console.log(accessToken);
     return { accessToken };
   }
 

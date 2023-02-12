@@ -11,6 +11,8 @@ import { House_img } from '../../db_entity/house_img/entities/house_img.entity';
 import { HttpService } from '@nestjs/axios';
 import { Storage } from '@google-cloud/storage';
 import { v1 } from 'uuid';
+import { Up } from 'src/db_entity/up/entities/up.entity';
+import { toTimestamp } from '../crawl/functions/crawl';
 
 @Injectable()
 export class HouseService {
@@ -63,7 +65,6 @@ export class HouseService {
 
       [region_id],
     );
-    console.log(builder);
     builder.map((each) => {
       each.img_urls = JSON.parse(each.img_urls);
       return each;
@@ -83,8 +84,6 @@ export class HouseService {
         'imgs',
       ],
     });
-    console.log(result);
-
     if (result.is_crolled) {
       return {
         id: result.id,
@@ -128,7 +127,6 @@ export class HouseService {
       where: { id: userResult.id },
       relations: ['houses'],
     });
-    // console.log(house_userResult);
 
     // 거기서 house_id들만 뽑아내기
     const house_ids = house_userResult.houses.map((house) => house.id);
@@ -184,7 +182,6 @@ export class HouseService {
         },
       });
     }
-    // console.log(house_imgResults);
 
     const lastResult = house_ids.map((house_id) => {
       const result1 = house_userResult.houses.find(
@@ -242,7 +239,6 @@ export class HouseService {
 
     // 3. 현재 로그인된 유저가, 이 house의 주인인지 검증
     const result2 = result1.users.find((user) => {
-      console.log(user.id, userResult.id);
       return user.id === userResult.id;
     });
 
@@ -252,7 +248,6 @@ export class HouseService {
     // 4. 주인일시, 소프트 삭제
     if (isOwner) {
       const result3 = await this.houseRepository.softDelete({ id: house_id });
-      console.log('삭제 됨', result3);
 
       const storage = new Storage({
         projectId: 'board-373207',
@@ -264,11 +259,9 @@ export class HouseService {
         relations: ['house'],
       });
 
-      console.log(result4);
       //storage에서 삭제
       result4.map((el) => {
         const filename = el.img_url.substring(el.img_url.lastIndexOf('/') + 1);
-        console.log('filename : ' + filename);
         storage.file(filename).delete();
       });
 
@@ -282,9 +275,16 @@ export class HouseService {
   }
 
   async findHouseByLocation({ location }) {
-    return await this.house_locationRepository.findOne({
+    const locationResult = await this.house_locationRepository.findOne({
       where: { longitude: location.longitude, latitude: location.latitude },
     });
+    if (locationResult === null) return null;
+    const houseResult = await this.houseRepository.findOne({
+      where: {
+        id: locationResult.id,
+      },
+    });
+    return houseResult.id;
   }
 
   async create({ createHouseInput, reqUser }: Icreate) {
@@ -350,7 +350,11 @@ export class HouseService {
         new Promise(async (resolve, reject) => {
           try {
             img_urls.push(
-              'https://storage.googleapis.com/'+process.env.STORAGE+'/' + uuid + '.jpg',
+              'https://storage.googleapis.com/' +
+                process.env.STORAGE +
+                '/' +
+                uuid +
+                '.jpg',
             );
 
             el.createReadStream()
@@ -386,8 +390,7 @@ export class HouseService {
     return house_id;
   }
 
-  async update({ updateMyHouseInput, reqUser }: Iupdate) {
-    const { user_auth_id, auth_method } = reqUser;
+  async update({ updateMyHouseInput }: Iupdate) {
     const { house_id, house, house_location, house_cost, ...rest } =
       updateMyHouseInput;
 
@@ -402,7 +405,6 @@ export class HouseService {
         'imgs',
       ],
     });
-    // console.log(houseResult);
 
     // tb_house_location 업뎃 (좌표)
     const result1 = await this.house_locationRepository.save({
@@ -438,13 +440,11 @@ export class HouseService {
       projectId: 'board-373207',
       keyFilename: 'board-373207-a02f17b5865d.json',
     }).bucket(process.env.STORAGE);
-
     const result4 = await this.house_imgRepository.find({
       where: { house: { id: house_id } },
       relations: ['house'],
     });
 
-    console.log(result4);
     //storage에서 삭제
     result4.map((el) => {
       const filename = el.img_url.substring(el.img_url.lastIndexOf('/') + 1);
@@ -464,7 +464,11 @@ export class HouseService {
         new Promise(async (resolve, reject) => {
           try {
             img_urls.push(
-              'https://storage.googleapis.com/'+process.env.STORAGE+'/' + uuid + '.jpg',
+              'https://storage.googleapis.com/' +
+                process.env.STORAGE +
+                '/' +
+                uuid +
+                '.jpg',
             );
 
             el.createReadStream()
@@ -503,7 +507,6 @@ export class HouseService {
       relations: ['imgs', 'house_category'],
     });
     const result2 = result.map((house, index) => {
-      console.log(house);
       const aaa = result[index].imgs.map((house_img) => house_img.img_url);
       const category = house.house_category.id;
       return {

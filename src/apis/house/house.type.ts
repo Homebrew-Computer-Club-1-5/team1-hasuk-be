@@ -8,7 +8,6 @@ export interface Icreate {
 
 export interface Iupdate {
   updateMyHouseInput: UpdateMyHouseInput;
-  reqUser: IreqUser;
 }
 
 // export interface IhouseData {

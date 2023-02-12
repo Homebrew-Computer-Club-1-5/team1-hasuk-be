@@ -1,17 +1,21 @@
-import { Field, ObjectType, OmitType } from "@nestjs/graphql";
-import { House } from "src/db_entity/house/entities/house.entity";
-import { CategoryOutput } from "../fetchAllHouses/fetchAllHouses_category.output";
-import { ImgOutput } from "../fetchAllHouses/fetchAllHouse_house_img.output";
-import { RegionOutput } from "./fetchHouse_region.output";
+import { Field, ObjectType, OmitType } from '@nestjs/graphql';
+import { House } from 'src/db_entity/house/entities/house.entity';
+import { CategoryOutput } from '../fetchAllHouses/fetchAllHouses_category.output';
+import { ImgOutput } from '../fetchAllHouses/fetchAllHouse_house_img.output';
+import { RegionOutput } from './fetchHouse_region.output';
 
 @ObjectType()
-export class FetchHouseOutput extends OmitType(House, ['house_category', 'region', 'imgs']){
-    @Field(()=> CategoryOutput)
-    house_category : CategoryOutput
+export class FetchHouseOutput extends OmitType(House, [
+  'house_category',
+  'region',
+  'imgs',
+]) {
+  @Field(() => CategoryOutput)
+  house_category: CategoryOutput;
 
-    @Field(()=>RegionOutput)
-    region : RegionOutput
+  @Field(() => RegionOutput, { nullable: true })
+  region: RegionOutput;
 
-    @Field(() => [ImgOutput])
-    imgs: ImgOutput[];
+  @Field(() => [ImgOutput])
+  imgs: ImgOutput[];
 }
