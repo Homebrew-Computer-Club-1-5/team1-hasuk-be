@@ -240,6 +240,7 @@ input CreateHouseInput {
   region_id: Int!
   house_category_id: Int!
   imgRawDatas: [Upload!]
+  googleLinks: [String!]
 }
 
 input HouseInput {
@@ -264,5 +265,6 @@ input UpdateMyHouseInput {
   region_id: Int!
   house_category_id: Int!
   imgRawDatas: [Upload!]
+  googleLinks: [String!]
   house_id: Int!
 }

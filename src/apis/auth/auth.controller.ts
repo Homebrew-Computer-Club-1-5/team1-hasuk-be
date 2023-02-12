@@ -53,7 +53,8 @@ export class AuthController {
     );
 
     res.redirect(
-      `${process.env.CLIENT_URL}/main?accessToken=${makeTokensResult.accessToken}`,
+      // `${process.env.CLIENT_URL}?accessToken=${makeTokensResult.accessToken}`,
+      `http://127.0.0.1:3000/main?accessToken=${makeTokensResult.accessToken}`,
     );
   }
 
