@@ -257,7 +257,7 @@ export class HouseService {
       const storage = new Storage({
         projectId: 'board-373207',
         keyFilename: 'board-373207-a02f17b5865d.json',
-      }).bucket('hasuk-storage');
+      }).bucket(process.env.STORAGE);
 
       const result4 = await this.house_imgRepository.find({
         where: { house: { id: house_id } },
@@ -342,7 +342,7 @@ export class HouseService {
     const storage = new Storage({
       projectId: 'board-373207',
       keyFilename: 'board-373207-a02f17b5865d.json',
-    }).bucket('hasuk-storage');
+    }).bucket(process.env.STORAGE);
 
     await Promise.all(
       waitedFiles.map((el) => {
@@ -350,13 +350,13 @@ export class HouseService {
         new Promise(async (resolve, reject) => {
           try {
             img_urls.push(
-              'https://storage.googleapis.com/hasuk-storage/' + uuid + '.jpg',
+              'https://storage.googleapis.com/'+process.env.STORAGE+'/' + uuid + '.jpg',
             );
 
             el.createReadStream()
               .pipe(storage.file(uuid + '.jpg').createWriteStream())
               .on('finish', () => {
-                resolve(`hasuk-storage/${uuid}.jpg`);
+                resolve(`${process.env.STORAGE}/${uuid}.jpg`);
               })
               .on('error', () => {
                 reject();
@@ -437,7 +437,7 @@ export class HouseService {
     const storage = new Storage({
       projectId: 'board-373207',
       keyFilename: 'board-373207-a02f17b5865d.json',
-    }).bucket('hasuk-storage');
+    }).bucket(process.env.STORAGE);
 
     const result4 = await this.house_imgRepository.find({
       where: { house: { id: house_id } },
@@ -464,13 +464,13 @@ export class HouseService {
         new Promise(async (resolve, reject) => {
           try {
             img_urls.push(
-              'https://storage.googleapis.com/hasuk-storage/' + uuid + '.jpg',
+              'https://storage.googleapis.com/'+process.env.STORAGE+'/' + uuid + '.jpg',
             );
 
             el.createReadStream()
               .pipe(storage.file(uuid + '.jpg').createWriteStream())
               .on('finish', () => {
-                resolve(`hasuk-storage/${uuid}.jpg`);
+                resolve(`${process.env.STORAGE}/${uuid}.jpg`);
               })
               .on('error', () => {
                 reject();
