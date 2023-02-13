@@ -8,8 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        # with:
-        #   ref: develop
+        with:
+          ref: develop
+      - name: Access cloned folder
+        run: |
+          pwd
+          ls
+          cd team1-hasuk-be
+          ls
   dockerstop:
     runs-on: ubuntu-latest
     steps:
