@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: stoprm
-        run :
+        run : |
               ids=$(docker ps -a -q)
               for id in $ids
               do
