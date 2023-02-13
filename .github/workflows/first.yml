@@ -21,13 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: docker/compose:1.29.0
-        args:
-          - -f
-          - docker-compose.dev.yaml
-          - build
+        run: docker-compose -f docker-compose.dev.yaml build
 
       - name: docker/compose:1.29.0
-        args:
-          - -f
-          - docker-compose.dev.yaml
-          - up
+        run: docker-compose -f docker-compose.dev.yaml up
