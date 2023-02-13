@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Not, Repository } from 'typeorm';
 import { House } from '../../db_entity/house/entities/house.entity';
 import { House_cost } from '../../db_entity/house_cost/entities/house_cost.entity';
 import { House_location } from '../../db_entity/house_location/entities/house_location.entity';
@@ -435,13 +435,12 @@ export class HouseService {
     });
 
     // 이미지 업뎃
-
     const storage = new Storage({
       projectId: 'board-373207',
       keyFilename: 'board-373207-a02f17b5865d.json',
     }).bucket(process.env.STORAGE);
     const result4 = await this.house_imgRepository.find({
-      where: { house: { id: house_id } },
+      where: { house: { id: house_id }, img_url: Not(In(rest.googleLinks))},
       relations: ['house'],
     });
 
@@ -451,7 +450,7 @@ export class HouseService {
       storage.file(filename).delete();
     });
     //db에서 삭제
-    await this.house_imgRepository.delete({ house: { id: house_id } });
+    this.house_imgRepository.remove(result4);
 
     //새로운 이미지파일로 업데이트
     const imgRawDatas = rest.imgRawDatas;
