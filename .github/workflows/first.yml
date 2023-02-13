@@ -25,6 +25,11 @@ jobs:
   buildup:
     runs-on: ubuntu-latest
     steps:
+      -name: pwd&ls
+        run : |
+              pwd
+              ls
+
       - name: docker/compose:1.29.0
         run: docker-compose -f docker-compose.dev.yaml build
 
