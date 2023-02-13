@@ -14,10 +14,11 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async makeTokens({ user_auth_id, auth_method }, res: Response | undefined) {
+  async makeTokens({ reqUser }, res: Response | undefined) {
+    const { user_auth_id, auth_method, name } = reqUser;
     // 리프레시 토큰 만들고, 헤더 셋팅
     const refreshToken = this.jwtService.sign(
-      { user_auth_id, auth_method },
+      { user_auth_id, auth_method, name },
       { secret: 'jwtRefreshStrategyKey', expiresIn: '2w' },
     );
     if (res) {
@@ -31,7 +32,7 @@ export class AuthService {
 
     // 액세스 토큰 만들어서
     const accessToken = this.jwtService.sign(
-      { user_auth_id, auth_method },
+      { user_auth_id, auth_method, name },
       { secret: 'jwtAccessStrategyKey', expiresIn: '2h' },
     );
     return { accessToken };

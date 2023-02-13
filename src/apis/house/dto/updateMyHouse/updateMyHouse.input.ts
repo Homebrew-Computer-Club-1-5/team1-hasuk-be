@@ -13,4 +13,7 @@ import { CreateHouseInput } from '../createHouse/createHouse.input';
 export class UpdateMyHouseInput extends CreateHouseInput {
   @Field(() => Int)
   house_id: number;
+
+  @Field(() => [String], { nullable: true })
+  googleLinks: string[];
 }

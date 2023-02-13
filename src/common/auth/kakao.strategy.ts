@@ -9,7 +9,6 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     });
   }
   async validate(accessToken, refreshToken, profile) {
-    // console.log(profile);
     const {
       username,
       _json: {
@@ -18,7 +17,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     } = profile;
     return {
       auth_method: 1,
-      name: username,
+      name: profile.username,
       user_auth_id: email,
       age_range: age_range ? age_range : '없음',
     };

@@ -217,7 +217,6 @@ type Query {
   fetchMyHouse: [FetchMyHouseOutput!]!
   fetchCrawledHouses: [FetchCrawledHousesOutput!]!
   fetchImgsByHouse(houseId: Float!): [House_img!]!
-  kakaoLogin: String!
 }
 
 input House_locationInput {
@@ -240,7 +239,6 @@ input CreateHouseInput {
   region_id: Int!
   house_category_id: Int!
   imgRawDatas: [Upload!]
-  googleLinks: [String!]
 }
 
 input HouseInput {
@@ -265,6 +263,6 @@ input UpdateMyHouseInput {
   region_id: Int!
   house_category_id: Int!
   imgRawDatas: [Upload!]
-  googleLinks: [String!]
   house_id: Int!
+  googleLinks: [String!]
 }

@@ -292,7 +292,8 @@ export class HouseService {
     const { house, house_location, house_cost, ...rest } = createHouseInput;
     // 1. 1:1 테이블 등록
     // 1) tb_house_location 등록
-    console.log(rest);
+
+    console.log(house_location);
     const house_locationResult = await this.house_locationRepository.save({
       ...house_location,
     });
@@ -409,6 +410,8 @@ export class HouseService {
     });
 
     // tb_house_location 업뎃 (좌표)
+    console.log(houseResult.house_location);
+    console.log(house_location);
     const result1 = await this.house_locationRepository.save({
       id: houseResult.house_location.id,
       latitude: house_location.latitude,
