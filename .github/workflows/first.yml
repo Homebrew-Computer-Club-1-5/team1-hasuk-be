@@ -1,0 +1,37 @@
+name: workflow_test
+on:
+  push:
+    branches:
+      - develop
+jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with: develop
+  dockerstop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: stop
+        run : docker stop $(docker ps -a -q)
+      - name: rm
+        run : docker rm 'docker ps -a -q'
+
+  buildup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: docker/compose:1.29.0
+        args:
+          - -f
+          - docker-compose.dev.yaml
+          - build
+
+      - name: docker/compose:1.29.0
+        args:
+          - -f
+          - docker-compose.dev.yaml
+          - up
+
+
+
+
