@@ -395,8 +395,6 @@ export class HouseService {
   async update({ updateMyHouseInput }: Iupdate) {
     const { house_id, house, house_location, house_cost, ...rest } =
       updateMyHouseInput;
-
-    console.log(rest);
     // 메인 테이블에서 FK까지 전부다 조회
     const houseResult = await this.houseRepository.findOne({
       where: { id: house_id },
@@ -410,8 +408,6 @@ export class HouseService {
     });
 
     // tb_house_location 업뎃 (좌표)
-    console.log(houseResult.house_location);
-    console.log(house_location);
     const result1 = await this.house_locationRepository.save({
       id: houseResult.house_location.id,
       latitude: house_location.latitude,
@@ -419,12 +415,23 @@ export class HouseService {
     });
 
     // 2. 가격 업뎃
-    const result2 = await this.house_costRepository.save({
-      id: houseResult.house_cost.id,
-      month_cost: house_cost.month_cost,
-      deposit: house_cost.deposit,
-      other_info: house_cost.other_info,
-    });
+    let result2;
+    // 기존에 house_cost가 없었던 경우
+    if (houseResult.house_cost === null) {
+      console.log('이거 실행');
+      result2 = await this.house_costRepository.save({
+        month_cost: house_cost.month_cost,
+        deposit: house_cost.deposit,
+        other_info: house_cost.other_info,
+      });
+    } else {
+      result2 = await this.house_costRepository.save({
+        id: houseResult.house_cost.id,
+        month_cost: house_cost.month_cost,
+        deposit: house_cost.deposit,
+        other_info: house_cost.other_info,
+      });
+    }
 
     // 4. house 테이블
     // 지역 업뎃
@@ -433,6 +440,7 @@ export class HouseService {
       contact_number: house.contact_number,
       gender: house.gender,
       house_other_info: house.house_other_info,
+      house_cost: result2,
       region: { id: rest.region_id },
       house_category: { id: rest.house_category_id },
       has_empty: 1,
@@ -445,7 +453,7 @@ export class HouseService {
       keyFilename: 'board-373207-a02f17b5865d.json',
     }).bucket(process.env.STORAGE);
     const result4 = await this.house_imgRepository.find({
-      where: { house: { id: house_id }, img_url: Not(In(rest.googleLinks))},
+      where: { house: { id: house_id }, img_url: Not(In(rest.googleLinks)) },
       relations: ['house'],
     });
 
