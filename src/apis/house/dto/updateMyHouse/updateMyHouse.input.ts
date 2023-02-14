@@ -14,6 +14,6 @@ export class UpdateMyHouseInput extends CreateHouseInput {
   @Field(() => Int)
   house_id: number;
 
-  @Field(() => [String], {nullable : true})
+  @Field(() => [String], { nullable: true })
   googleLinks: string[];
 }

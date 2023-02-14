@@ -46,14 +46,14 @@ export class AuthController {
     // 3. 로컬 aT + rT 만들어서 반환
     const makeTokensResult = await this.authService.makeTokens(
       {
-        user_auth_id,
-        auth_method,
+        reqUser: req.user,
       },
       res,
     );
 
     res.redirect(
-      `${process.env.CLIENT_URL}/main?accessToken=${makeTokensResult.accessToken}`,
+      // `${process.env.CLIENT_URL}?accessToken=${makeTokensResult.accessToken}`,
+      `http://127.0.0.1:3000?accessToken=${makeTokensResult.accessToken}`,
     );
   }
 
@@ -63,7 +63,6 @@ export class AuthController {
     @Req() req: Request & IOauthUser, //
     @Res() res: Response,
   ) {
-    console.log('restore 성공~');
     const { auth_method, user_auth_id } = req.user;
     //1. 리프레시 토큰 받아서 2주 지났는지 확인
 
@@ -71,10 +70,17 @@ export class AuthController {
 
     //3. 안지났으면 => 액세스 토큰 재발급해서 리턴
     const restoreAccesTokenResult = await this.authService.makeTokens(
-      { auth_method, user_auth_id },
+      { reqUser: req.user },
       undefined,
     );
+    if (restoreAccesTokenResult) console.log('토큰 refresh 성공');
 
     res.send(restoreAccesTokenResult.accessToken);
+  }
+
+  @Get('/api/auth/login-check')
+  @UseGuards(AuthGuard('jwtAccessStrategy'))
+  loginCheck(@Req() req: Request & IOauthUser) {
+    return req.user;
   }
 }
