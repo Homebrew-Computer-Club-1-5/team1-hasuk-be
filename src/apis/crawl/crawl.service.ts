@@ -212,7 +212,7 @@ export class CrawlService {
     name: 'crawl',
     timeZone: 'Asia/Seoul',
   })
-  async crawl({ latestBoardDateByArg }) {
+  async crawl() {
     console.log(
       '====================== Crawl init ===========================',
     );
