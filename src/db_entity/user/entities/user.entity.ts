@@ -41,6 +41,15 @@ export class User {
   @Field(() => [House])
   houses: House[];
 
+  @JoinTable({
+    name: 'tb_wish',
+    joinColumns: [{ name: 'user_id' }],
+    inverseJoinColumns: [{ name: 'house_id' }],
+  })
+  @ManyToMany(() => House, (house) => house.users)
+  @Field(() => [House])
+  wish_houses: House[];
+
   @OneToMany(() => Up, (ups) => ups.user)
   @Field(() => [Up], { nullable: 'items' })
   ups: Up[];

@@ -73,6 +73,26 @@ export class HouseService {
     return builder;
   }
 
+  async findAllHousesByRegionLogined({ region_id, reqUser }) {
+    const { user_auth_id, auth_method } = reqUser;
+    // 1. db에서 현재 인가요청 보낸 유저 조회
+    const userResult = await this.userRepository.findOne({
+      where: { user_auth_id: user_auth_id, auth_method: auth_method },
+    });
+
+    let builder = await this.houseRepository.query(
+      "WITH H AS (SELECT tb_house.*, CASE JSON_ARRAYAGG(tb_house_img.img_url) WHEN '[null]' Then '[]' ELSE JSON_ARRAYAGG(tb_house_img.img_url) END AS img_urls, tb_wish.user_id IS NOT NULL AS isWish FROM tb_house LEFT JOIN tb_house_img ON tb_house.id = tb_house_img.house_id LEFT JOIN tb_wish ON (tb_house.id = tb_wish.house_id AND tb_wish.user_id = ?) GROUP BY tb_house.id), T AS (SELECT H.*, tb_region.name AS region_name, tb_house_category.name AS category_name , tb_house_cost.month_cost, tb_main_spot.name AS nearest_main_spot_name, (POW(tb_main_spot_location.longitude - tb_house_location.longitude, 2) + POW(tb_main_spot_location.latitude - tb_house_location.latitude, 2)) AS mainSpotDistance FROM tb_house_location, tb_main_spot_location, tb_main_spot, tb_house_category, (H LEFT JOIN tb_house_cost ON tb_house_cost.id = H.cost_id LEFT JOIN tb_region ON H.region_id = tb_region.id) WHERE H.region_id = ? AND H.house_category_id = tb_house_category.id AND H.house_location_id = tb_house_location.id AND tb_main_spot.main_spot_location_id = tb_main_spot_location.id) SELECT  T.* from T, (SELECT id, MIN(mainSpotDistance) as nd from T group by T.id) AS T2 WHERE T.mainSpotDistance = T2.nd and T.id = T2.id;",
+      [userResult.id, region_id],
+    );
+
+    builder.map((each) => {
+      each.img_urls = JSON.parse(each.img_urls);
+      return each;
+    });
+
+    return builder;
+  }
+
   async findHouse({ house_id }) {
     const result = await this.houseRepository.findOne({
       where: { id: house_id },
