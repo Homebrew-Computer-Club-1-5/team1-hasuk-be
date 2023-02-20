@@ -17,6 +17,7 @@ import { House_img } from 'src/db_entity/house_img/entities/house_img.entity';
 import { FetchHouseOutput } from './dto/fetchHouse/fetchHouse.output';
 import { fetchAllHousesOutput } from './dto/fetchAllHouses/fetchAllHouses.output';
 import { FetchUpOutput } from './dto/fetchUp/fetchUp.output';
+import { fetchHousesByRegionLoginedOutput } from './dto/fetchHousesByRegionLogined/fetchHousesByRegionLogined.output';
 
 @Resolver()
 export class HouseResolver {
@@ -33,6 +34,15 @@ export class HouseResolver {
   @Query(() => [fetchHousesByRegionOutput])
   fetchHousesByRegion(@Args('region_id') region_id: number) {
     return this.houseService.findAllHousesByRegion({ region_id });
+  }
+
+  //로그인한 유저에게 특정부근의 집+가장가까운 주요지점 정보 가져오기
+  @UseGuards(GqlAuthAccessGuard)
+  @Query(() => [fetchHousesByRegionLoginedOutput])
+  fetchHousesByRegionLogined(
+    @ReqUser() reqUser: IreqUser,
+    @Args('region_id') region_id: number) {
+    return this.houseService.findAllHousesByRegionLogined({ region_id, reqUser });
   }
 
   //특정 집 정보 가져오기
