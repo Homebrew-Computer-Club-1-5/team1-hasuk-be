@@ -3,6 +3,6 @@ import { FetchHouseOutput } from "../fetchHouse/fetchHouse.output";
 
 @ObjectType()
 export class FetchHouseLoginedOutput extends FetchHouseOutput{
-    @Field(() => Int)
+    @Field(() => Int, { nullable: true })
     is_wished: number;
 }
