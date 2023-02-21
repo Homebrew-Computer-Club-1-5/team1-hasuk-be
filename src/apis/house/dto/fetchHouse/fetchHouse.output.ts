@@ -1,4 +1,4 @@
-import { Field, ObjectType, OmitType } from '@nestjs/graphql';
+import { Field, Int, ObjectType, OmitType } from '@nestjs/graphql';
 import { House } from 'src/db_entity/house/entities/house.entity';
 import { CategoryOutput } from '../fetchAllHouses/fetchAllHouses_category.output';
 import { ImgOutput } from '../fetchAllHouses/fetchAllHouse_house_img.output';
@@ -18,4 +18,7 @@ export class FetchHouseOutput extends OmitType(House, [
 
   @Field(() => [ImgOutput])
   imgs: ImgOutput[];
+
+  @Field(() => Int)
+  isWished: number;
 }

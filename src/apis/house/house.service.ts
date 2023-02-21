@@ -59,29 +59,19 @@ export class HouseService {
     return result2;
   }
 
-  async findAllHousesByRegion({ region_id }) {
-    let builder = await this.houseRepository.query(
-      "WITH H AS (SELECT tb_house.*, case JSON_ARRAYAGG(tb_house_img.img_url) WHEN '[null]' Then '[]' ELSE JSON_ARRAYAGG(tb_house_img.img_url) END AS img_urls FROM tb_house LEFT JOIN tb_house_img ON tb_house.id = tb_house_img.house_id  GROUP BY tb_house.id), T AS (SELECT H.*, tb_region.name AS region_name, tb_house_category.name AS category_name , tb_house_cost.month_cost, tb_main_spot.name AS nearest_main_spot_name, (POW(tb_main_spot_location.longitude - tb_house_location.longitude, 2) + POW(tb_main_spot_location.latitude - tb_house_location.latitude, 2)) AS mainSpotDistance FROM tb_house_location, tb_main_spot_location, tb_main_spot, tb_house_category, (H LEFT JOIN tb_house_cost ON tb_house_cost.id = H.cost_id LEFT JOIN tb_region ON H.region_id = tb_region.id) WHERE H.region_id = ? AND H.house_category_id = tb_house_category.id AND H.house_location_id = tb_house_location.id AND tb_main_spot.main_spot_location_id = tb_main_spot_location.id) SELECT  T.* from T, (SELECT id, MIN(mainSpotDistance) as nd from T group by T.id) AS T2 WHERE T.mainSpotDistance = T2.nd and T.id = T2.id;",
-
-      [region_id],
-    );
-    builder.map((each) => {
-      each.img_urls = JSON.parse(each.img_urls);
-      return each;
-    });
-
-    return builder;
-  }
-
-  async findAllHousesByRegionLogined({ region_id, reqUser }) {
-    const { user_auth_id, auth_method } = reqUser;
-    // 1. db에서 현재 인가요청 보낸 유저 조회
-    const userResult = await this.userRepository.findOne({
-      where: { user_auth_id: user_auth_id, auth_method: auth_method },
-    });
+  async findAllHousesByRegion({ region_id, reqUser = null }) {
+    let userResult;
+    if(reqUser){
+      const { user_auth_id, auth_method } = reqUser;
+      userResult = await this.userRepository.findOne({
+        where: { user_auth_id: user_auth_id, auth_method: auth_method },
+      });
+    }else{
+      userResult = {id : null};
+    }
 
     let builder = await this.houseRepository.query(
-      "WITH H AS (SELECT tb_house.*, CASE JSON_ARRAYAGG(tb_house_img.img_url) WHEN '[null]' Then '[]' ELSE JSON_ARRAYAGG(tb_house_img.img_url) END AS img_urls, tb_wish.user_id IS NOT NULL AS isWish FROM tb_house LEFT JOIN tb_house_img ON tb_house.id = tb_house_img.house_id LEFT JOIN tb_wish ON (tb_house.id = tb_wish.house_id AND tb_wish.user_id = ?) GROUP BY tb_house.id), T AS (SELECT H.*, tb_region.name AS region_name, tb_house_category.name AS category_name , tb_house_cost.month_cost, tb_main_spot.name AS nearest_main_spot_name, (POW(tb_main_spot_location.longitude - tb_house_location.longitude, 2) + POW(tb_main_spot_location.latitude - tb_house_location.latitude, 2)) AS mainSpotDistance FROM tb_house_location, tb_main_spot_location, tb_main_spot, tb_house_category, (H LEFT JOIN tb_house_cost ON tb_house_cost.id = H.cost_id LEFT JOIN tb_region ON H.region_id = tb_region.id) WHERE H.region_id = ? AND H.house_category_id = tb_house_category.id AND H.house_location_id = tb_house_location.id AND tb_main_spot.main_spot_location_id = tb_main_spot_location.id) SELECT  T.* from T, (SELECT id, MIN(mainSpotDistance) as nd from T group by T.id) AS T2 WHERE T.mainSpotDistance = T2.nd and T.id = T2.id;",
+      "WITH H AS (SELECT tb_house.*, CASE JSON_ARRAYAGG(tb_house_img.img_url) WHEN '[null]' Then '[]' ELSE JSON_ARRAYAGG(tb_house_img.img_url) END AS img_urls, tb_wish.user_id IS NOT NULL AS is_wish FROM tb_house LEFT JOIN tb_house_img ON tb_house.id = tb_house_img.house_id LEFT JOIN tb_wish ON (tb_house.id = tb_wish.house_id AND tb_wish.user_id = ?) GROUP BY tb_house.id), T AS (SELECT H.*, tb_region.name AS region_name, tb_house_category.name AS category_name , tb_house_cost.month_cost, tb_main_spot.name AS nearest_main_spot_name, (POW(tb_main_spot_location.longitude - tb_house_location.longitude, 2) + POW(tb_main_spot_location.latitude - tb_house_location.latitude, 2)) AS mainSpotDistance FROM tb_house_location, tb_main_spot_location, tb_main_spot, tb_house_category, (H LEFT JOIN tb_house_cost ON tb_house_cost.id = H.cost_id LEFT JOIN tb_region ON H.region_id = tb_region.id) WHERE H.region_id = ? AND H.house_category_id = tb_house_category.id AND H.house_location_id = tb_house_location.id AND tb_main_spot.main_spot_location_id = tb_main_spot_location.id) SELECT  T.* from T, (SELECT id, MIN(mainSpotDistance) as nd from T group by T.id) AS T2 WHERE T.mainSpotDistance = T2.nd and T.id = T2.id;",
       [userResult.id, region_id],
     );
 
@@ -93,8 +83,14 @@ export class HouseService {
     return builder;
   }
 
-  async findHouse({ house_id }) {
-    const result = await this.houseRepository.findOne({
+  async findHouse({ house_id, reqUser = null}) {
+    const { user_auth_id, auth_method } = reqUser;
+    // 1. reqUser로 유저 조회
+    const userResult = await this.userRepository.findOne({
+      where: { user_auth_id: user_auth_id, auth_method: auth_method },
+    });
+
+    let result = await this.houseRepository.findOne({
       where: { id: house_id },
       relations: [
         'house_location',
@@ -104,6 +100,20 @@ export class HouseService {
         'imgs',
       ],
     });
+
+    const promise = new Promise(resolve => {
+      resolve(result);
+    });
+    
+    // promise.then(datas => {
+    //   const newData = datas.map(data=>{
+    //     data.isWished = 1;
+    //   })
+    // }).then(datas => {
+    //   console.log(datas);
+    // });
+
+
     if (result.is_crolled) {
       return {
         id: result.id,
@@ -136,6 +146,115 @@ export class HouseService {
   }
 
   async findMyHouses({ reqUser }) {
+    const { user_auth_id, auth_method } = reqUser;
+    // 1. reqUser로 유저 조회
+    const userResult = await this.userRepository.findOne({
+      where: { user_auth_id: user_auth_id, auth_method: auth_method },
+    });
+
+    // 2. tb_house_user에서 house들 모두 조회
+    const house_userResult = await this.userRepository.findOne({
+      where: { id: userResult.id },
+      relations: ['houses'],
+    });
+
+    // 거기서 house_id들만 뽑아내기
+    const house_ids = house_userResult.houses.map((house) => house.id);
+
+    // house_id마다의 house_location_ids, house_img_ids 추출
+    const house_img_ids: number[][] = [];
+    const house_location_ids = [];
+    for (let i = 0; i < house_ids.length; i++) {
+      const house_id = house_ids[i];
+      const house_Result = await this.houseRepository.findOne({
+        where: { id: house_id },
+        relations: ['house_location', 'imgs'],
+      });
+      house_location_ids.push(house_Result.house_location.id);
+
+      const house_img_ids__: number[] = house_Result.imgs.map((img) => img.id);
+      house_img_ids.push(house_img_ids__);
+    }
+
+    // 4. house_img 에서 이미지 링크"들", 기타 결과들 조회
+    const house_imgResults = [];
+    const house_etcResults = [];
+    for (let i = 0; i < house_ids.length; i++) {
+      const house_id = house_ids[i];
+      const houseResult = await this.houseRepository.findOne({
+        where: { id: house_id },
+        relations: [
+          'imgs',
+          'region',
+          'house_cost',
+          'house_category',
+          'house_location',
+        ],
+      });
+
+      const img_urls = houseResult.imgs.map((house_img) => house_img.img_url);
+      house_imgResults.push({
+        id: house_id,
+        img_urls: img_urls,
+      });
+      house_etcResults.push({
+        id: house_id,
+        region: houseResult.region.id,
+        cost: {
+          month_cost: houseResult.house_cost.month_cost,
+          deposit: houseResult.house_cost.deposit,
+          other_info: houseResult.house_cost.other_info,
+        },
+        house_category: houseResult.house_category.id,
+        house_location: {
+          latitude: houseResult.house_location.latitude,
+          longitude: houseResult.house_location.longitude,
+        },
+      });
+    }
+
+    const lastResult = house_ids.map((house_id) => {
+      const result1 = house_userResult.houses.find(
+        (house) => house.id === house_id,
+      );
+
+      // const result2 = house_locationResults.find(
+      //   (house_location) => house_location.id === house_id,
+      // );
+
+      const result3 = house_imgResults.find(
+        (house_imgResult) => house_imgResult.id === house_id,
+      );
+
+      const result4 = house_etcResults.find((house_etcREsult) => {
+        return house_etcREsult.id === house_id;
+      });
+
+      const result5 = {
+        id: result1.id,
+        contact_number: result1.contact_number,
+        gender: result1.gender,
+        house_other_info: result1.house_other_info,
+        region: result4.region,
+        cost: {
+          month_cost: result4.cost.month_cost,
+          deposit: result4.cost.deposit,
+          other_info: result4.cost.other_info,
+        },
+        house_category: result4.house_category,
+        board_date: result1.board_date,
+        img_urls: result3.img_urls,
+        location: {
+          latitude: result4.house_location.latitude,
+          longitude: result4.house_location.longitude,
+        },
+      };
+      return result5;
+    });
+    return lastResult;
+  }
+
+  async findMyWishHouses({ reqUser }) {
     const { user_auth_id, auth_method } = reqUser;
     // 1. reqUser로 유저 조회
     const userResult = await this.userRepository.findOne({
@@ -415,6 +534,8 @@ export class HouseService {
   async update({ updateMyHouseInput }: Iupdate) {
     const { house_id, house, house_location, house_cost, ...rest } =
       updateMyHouseInput;
+
+    console.log(rest);
     // 메인 테이블에서 FK까지 전부다 조회
     const houseResult = await this.houseRepository.findOne({
       where: { id: house_id },
@@ -428,6 +549,8 @@ export class HouseService {
     });
 
     // tb_house_location 업뎃 (좌표)
+    console.log(houseResult.house_location);
+    console.log(house_location);
     const result1 = await this.house_locationRepository.save({
       id: houseResult.house_location.id,
       latitude: house_location.latitude,
@@ -435,23 +558,12 @@ export class HouseService {
     });
 
     // 2. 가격 업뎃
-    let result2;
-    // 기존에 house_cost가 없었던 경우
-    if (houseResult.house_cost === null) {
-      console.log('이거 실행');
-      result2 = await this.house_costRepository.save({
-        month_cost: house_cost.month_cost,
-        deposit: house_cost.deposit,
-        other_info: house_cost.other_info,
-      });
-    } else {
-      result2 = await this.house_costRepository.save({
-        id: houseResult.house_cost.id,
-        month_cost: house_cost.month_cost,
-        deposit: house_cost.deposit,
-        other_info: house_cost.other_info,
-      });
-    }
+    const result2 = await this.house_costRepository.save({
+      id: houseResult.house_cost.id,
+      month_cost: house_cost.month_cost,
+      deposit: house_cost.deposit,
+      other_info: house_cost.other_info,
+    });
 
     // 4. house 테이블
     // 지역 업뎃
@@ -460,7 +572,6 @@ export class HouseService {
       contact_number: house.contact_number,
       gender: house.gender,
       house_other_info: house.house_other_info,
-      house_cost: result2,
       region: { id: rest.region_id },
       house_category: { id: rest.house_category_id },
       has_empty: 1,
@@ -473,7 +584,7 @@ export class HouseService {
       keyFilename: 'board-373207-a02f17b5865d.json',
     }).bucket(process.env.STORAGE);
     const result4 = await this.house_imgRepository.find({
-      where: { house: { id: house_id }, img_url: Not(In(rest.googleLinks)) },
+      where: { house: { id: house_id }, img_url: Not(In(rest.googleLinks))},
       relations: ['house'],
     });
 

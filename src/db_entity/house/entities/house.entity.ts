@@ -87,7 +87,7 @@ export class House {
     joinColumns: [{ name: 'house_id' }],
     inverseJoinColumns: [{ name: 'user_id' }],
   })
-  @ManyToMany(() => User, (user) => user.houses)
+  @ManyToMany(() => User, (user) => user.wish_houses)
   wish_users: User[];
 
   @OneToMany(() => Up, (ups) => ups.house)

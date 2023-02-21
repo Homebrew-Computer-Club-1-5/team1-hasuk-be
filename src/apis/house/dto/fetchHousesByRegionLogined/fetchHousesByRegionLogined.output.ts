@@ -26,9 +26,9 @@ export class fetchHousesByRegionLoginedOutput extends OmitType(House, [
   @Field(() => Int)
   house_category_id: number;
 
-  // 임시
   @Field(() => String)
   board_date: string;
 
-  
+  @Field(()=> Int)
+  is_wish: number;
 }

@@ -162,6 +162,7 @@ type FetchHouseOutput {
   house_category: CategoryOutput!
   region: RegionOutput
   imgs: [ImgOutput!]!
+  isWished: Int!
 }
 
 type HouseOutput {
@@ -231,6 +232,7 @@ type Query {
   fetchHousesByRegion(region_id: Float!): [fetchHousesByRegionOutput!]!
   fetchHousesByRegionLogined(region_id: Float!): [fetchHousesByRegionLoginedOutput!]!
   fetchHouse(house_id: Float!): FetchHouseOutput!
+  fetchHouseLogined(house_id: Float!): FetchHouseOutput!
   fetchAllHouses: [House!]!
   fetchHouseByLocation(location: House_locationInput!): Float!
   fetchMyHouse: [FetchMyHouseOutput!]!

@@ -18,13 +18,13 @@ import { FetchHouseOutput } from './dto/fetchHouse/fetchHouse.output';
 import { fetchAllHousesOutput } from './dto/fetchAllHouses/fetchAllHouses.output';
 import { FetchUpOutput } from './dto/fetchUp/fetchUp.output';
 import { fetchHousesByRegionLoginedOutput } from './dto/fetchHousesByRegionLogined/fetchHousesByRegionLogined.output';
+import { FetchMyWishHousesOutput } from './dto/fetchMyWishHouses/fetchMyWishHouses.output';
 
 @Resolver()
 export class HouseResolver {
   constructor(private readonly houseService: HouseService) {}
 
   //모든부근의 모든 집 정보를 가져오기
-
   @Query(() => [fetchAllHousesOutput])
   fetchAllHousesGroupedByRegion() {
     return this.houseService.findAllHousesGroupedByRegion();
@@ -42,13 +42,22 @@ export class HouseResolver {
   fetchHousesByRegionLogined(
     @ReqUser() reqUser: IreqUser,
     @Args('region_id') region_id: number) {
-    return this.houseService.findAllHousesByRegionLogined({ region_id, reqUser });
+    return this.houseService.findAllHousesByRegion({ region_id, reqUser });
   }
 
   //특정 집 정보 가져오기
   @Query(() => FetchHouseOutput)
   fetchHouse(@Args('house_id') house_id: number) {
     return this.houseService.findHouse({ house_id });
+  }
+
+  @UseGuards(GqlAuthAccessGuard)
+  @Query(() => FetchHouseOutput)
+  fetchHouseLogined(
+    @Args('house_id') house_id: number,
+    @ReqUser() reqUser: IreqUser
+    ) {
+    return this.houseService.findHouse({ house_id, reqUser });
   }
 
   @Query(() => [House])
@@ -80,6 +89,12 @@ export class HouseResolver {
   @Query(() => [FetchMyHouseOutput])
   async fetchMyHouse(@ReqUser() reqUser: IreqUser) {
     return await this.houseService.findMyHouses({ reqUser });
+  }
+
+  @UseGuards(GqlAuthAccessGuard)
+  @Query(() => [FetchMyWishHousesOutput])
+  async fetchMyWishHouses(@ReqUser() reqUser: IreqUser) {
+    return await this.houseService.findMyWishHouses({ reqUser });
   }
 
   @UseGuards(GqlAuthAccessGuard)
