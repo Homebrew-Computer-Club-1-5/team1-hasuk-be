@@ -19,6 +19,4 @@ export class FetchHouseOutput extends OmitType(House, [
   @Field(() => [ImgOutput])
   imgs: ImgOutput[];
 
-  @Field(() => Int)
-  isWished: number;
 }

@@ -19,6 +19,7 @@ import { fetchAllHousesOutput } from './dto/fetchAllHouses/fetchAllHouses.output
 import { FetchUpOutput } from './dto/fetchUp/fetchUp.output';
 import { fetchHousesByRegionLoginedOutput } from './dto/fetchHousesByRegionLogined/fetchHousesByRegionLogined.output';
 import { FetchMyWishHousesOutput } from './dto/fetchMyWishHouses/fetchMyWishHouses.output';
+import { FetchHouseLoginedOutput } from './dto/fetchHouseLogined/fetchHouseLogined.output';
 
 @Resolver()
 export class HouseResolver {
@@ -52,7 +53,7 @@ export class HouseResolver {
   }
 
   @UseGuards(GqlAuthAccessGuard)
-  @Query(() => FetchHouseOutput)
+  @Query(() => FetchHouseLoginedOutput)
   fetchHouseLogined(
     @Args('house_id') house_id: number,
     @ReqUser() reqUser: IreqUser

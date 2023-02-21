@@ -53,7 +53,7 @@ type User {
   name: String
   auth_method: Int
   houses: [House!]!
-  wish_houses: [House!]!
+  wish_houses: [House!]
   ups: [Up]!
 }
 
@@ -207,6 +207,20 @@ type fetchHousesByRegionLoginedOutput {
   region_name: String!
   house_category_id: Int!
   board_date: String!
+  is_wish: Int!
+}
+
+type FetchMyWishHousesOutput {
+  img_urls: [String!]!
+  id: Int!
+  contact_number: String!
+  gender: Int!
+  house_other_info: String!
+  region: Int!
+  cost: House_costExceptId!
+  house_category: Int!
+  location: House_locationExceptId!
+  board_date: Float!
 }
 
 type Main_spot_locationOutput {
@@ -236,6 +250,7 @@ type Query {
   fetchAllHouses: [House!]!
   fetchHouseByLocation(location: House_locationInput!): Float!
   fetchMyHouse: [FetchMyHouseOutput!]!
+  fetchMyWishHouses: [FetchMyWishHousesOutput!]!
   fetchCrawledHouses: [FetchCrawledHousesOutput!]!
   fetchImgsByHouse(houseId: Float!): [House_img!]!
 }

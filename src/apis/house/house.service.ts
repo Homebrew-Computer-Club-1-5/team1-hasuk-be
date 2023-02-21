@@ -84,34 +84,30 @@ export class HouseService {
   }
 
   async findHouse({ house_id, reqUser = null}) {
-    const { user_auth_id, auth_method } = reqUser;
-    // 1. reqUser로 유저 조회
-    const userResult = await this.userRepository.findOne({
-      where: { user_auth_id: user_auth_id, auth_method: auth_method },
-    });
+    let userResult;
+
+    if(reqUser){
+      const { user_auth_id, auth_method } = reqUser;
+      userResult = await this.userRepository.findOne({
+        where: { user_auth_id: user_auth_id, auth_method: auth_method },
+      });
+    }else{
+      userResult = {id:null};
+    }
 
     let result = await this.houseRepository.findOne({
-      where: { id: house_id },
+      where: { id: house_id,  },
       relations: [
         'house_location',
         'house_cost',
         'house_category',
         'region',
         'imgs',
+        'wish_users',
       ],
     });
 
-    const promise = new Promise(resolve => {
-      resolve(result);
-    });
-    
-    // promise.then(datas => {
-    //   const newData = datas.map(data=>{
-    //     data.isWished = 1;
-    //   })
-    // }).then(datas => {
-    //   console.log(datas);
-    // });
+
 
 
     if (result.is_crolled) {
@@ -123,6 +119,7 @@ export class HouseService {
         house_other_info: result.house_other_info,
         has_emtpy: result.has_empty,
         imgs: result.imgs,
+        board_date: result.board_date,
         house_location: {
           latitude: 123.567,
           longitude: 123.567,
@@ -264,7 +261,7 @@ export class HouseService {
     // 2. tb_house_user에서 house들 모두 조회
     const house_userResult = await this.userRepository.findOne({
       where: { id: userResult.id },
-      relations: ['houses'],
+      relations: ['wish_houses'],
     });
 
     // 거기서 house_id들만 뽑아내기
