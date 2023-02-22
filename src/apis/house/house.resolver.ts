@@ -126,6 +126,15 @@ export class HouseResolver {
     return result2;
   }
 
+  @UseGuards(GqlAuthAccessGuard)
+  @Mutation(() => Int)
+  async updateWishHouse(
+    @ReqUser() reqUser: IreqUser,
+    @Args('house_id') house_id: number,
+  ){
+    return await this.houseService.updateWishHouse({house_id, reqUser});
+  }
+
   @Query(() => [FetchCrawledHousesOutput])
   async fetchCrawledHouses() {
     return await this.houseService.findAllCrawledHouses();

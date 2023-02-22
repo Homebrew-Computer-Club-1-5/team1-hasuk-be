@@ -738,4 +738,39 @@ export class HouseService {
 
     return result2;
   }
+
+  async updateWishHouse({house_id, reqUser}){
+    const { user_auth_id, auth_method } = reqUser;
+    
+    const userResult = await this.userRepository.findOne({
+      where: { user_auth_id: user_auth_id, auth_method: auth_method },
+    });
+
+    
+    let isWish = await this.houseRepository.findOne({
+      where: {id: house_id, wish_users: {id : userResult.id}},
+      relations:[
+        'wish_users'
+      ],
+    });
+    let houseResult = await this.houseRepository.findOne({
+      where: {id: house_id},
+      relations:[
+        'wish_users'
+      ],
+    });
+  
+    if(isWish){//찜해제
+      this.houseRepository.save({
+        id : house_id,
+        wish_users : (houseResult.wish_users.filter((element) => element.id !== userResult.id))
+      })
+    }else{//찜하기
+      this.houseRepository.save({
+        id : house_id,
+        wish_users : ((houseResult.wish_users) ? [...houseResult.wish_users, userResult] : [userResult])
+      });
+    }
+    return 1;
+  }
 }

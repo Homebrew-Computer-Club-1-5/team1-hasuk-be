@@ -264,6 +264,7 @@ type Query {
   fetchHouse(house_id: Float!): FetchHouseOutput!
   fetchHouseLogined(house_id: Float!): FetchHouseLoginedOutput!
   fetchAllHouses: [House!]!
+  fetchAllHousesLogined: [House!]!
   fetchHouseByLocation(location: House_locationInput!): Float!
   fetchMyHouse: [FetchMyHouseOutput!]!
   fetchMyWishHouses: [FetchMyWishHousesOutput!]!
@@ -280,6 +281,7 @@ type Mutation {
   createHouse(createHouseInput: CreateHouseInput!): String!
   deleteMyHouse(house_id: Float!): String!
   updateMyHouse(updateMyHouseInput: UpdateMyHouseInput!): Int!
+  updateWishHouse(house_id: Float!): Int!
   crawl(latestBoardDateByArg: Float!): String!
   fetchUp(house_id: Float!): FetchUpOutput!
 }
