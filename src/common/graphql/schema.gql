@@ -162,7 +162,6 @@ type FetchHouseOutput {
   house_category: CategoryOutput!
   region: RegionOutput
   imgs: [ImgOutput!]!
-  isWished: Int!
 }
 
 type HouseOutput {
@@ -223,6 +222,23 @@ type FetchMyWishHousesOutput {
   board_date: Float!
 }
 
+type FetchHouseLoginedOutput {
+  id: Int
+  contact_number: String
+  gender: Int
+  house_other_info: String
+  has_empty: Int
+  is_crolled: Int
+  board_date: Float
+  house_cost: House_cost
+  house_location: House_location!
+  ups: [Up]!
+  house_category: CategoryOutput!
+  region: RegionOutput
+  imgs: [ImgOutput!]!
+  is_wished: Int
+}
+
 type Main_spot_locationOutput {
   id: Int!
   latitude: Float!
@@ -246,7 +262,7 @@ type Query {
   fetchHousesByRegion(region_id: Float!): [fetchHousesByRegionOutput!]!
   fetchHousesByRegionLogined(region_id: Float!): [fetchHousesByRegionLoginedOutput!]!
   fetchHouse(house_id: Float!): FetchHouseOutput!
-  fetchHouseLogined(house_id: Float!): FetchHouseOutput!
+  fetchHouseLogined(house_id: Float!): FetchHouseLoginedOutput!
   fetchAllHouses: [House!]!
   fetchHouseByLocation(location: House_locationInput!): Float!
   fetchMyHouse: [FetchMyHouseOutput!]!

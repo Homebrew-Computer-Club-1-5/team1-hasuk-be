@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Not, Repository } from 'typeorm';
+import { ConnectionIsNotSetError, DataSource, In, IsNull, Not, Repository } from 'typeorm';
 import { House } from '../../db_entity/house/entities/house.entity';
 import { House_cost } from '../../db_entity/house_cost/entities/house_cost.entity';
 import { House_location } from '../../db_entity/house_location/entities/house_location.entity';
@@ -48,13 +48,57 @@ export class HouseService {
     return result;
   }
 
-  async findAllHouses() {
+  async findAllHouses({reqUser=null}) {
+    let userResult;
+    if(reqUser){
+      const { user_auth_id, auth_method } = reqUser;
+      userResult = await this.userRepository.findOne({
+        where: { user_auth_id: user_auth_id, auth_method: auth_method },
+      });
+    }else{
+      userResult = {id : 0};
+    }
+
     const result = await this.houseRepository.find({
       relations: ['region', 'house_cost', 'imgs', 'house_category'],
     });
-    const result2 = result.map((each) => {
+    
+    const result2 = result.map(async (each) => {
       each.board_date = parseInt(each.board_date as any);
-      return each;
+      let isWish = await this.houseRepository.findOne({
+        where: {id: each.id, wish_users: {id : userResult.id}},
+        relations:[
+          'wish_users',
+        ]
+      })
+      let wishVal;
+      if(isWish){
+        wishVal = 1;
+      }else{
+        wishVal = 0;
+      }
+      return {
+        id : each.id,
+        contact_number : each.contact_number,
+        gender : each.gender,
+        house_other_info : each.house_other_info,
+        has_empty : each.has_empty,
+        is_crolled : each.is_crolled,
+        board_date : each.board_date,
+        house_cost : each.house_cost,
+        house_location : each.house_location,
+        house_category : {
+          id: each.house_category.id,
+          name : each.house_category.name,
+        },
+        region : {
+          id : each.region.id,
+          name : each.region.name,
+        },
+        imgs : each.imgs,
+        ups : each.ups,
+        is_wished : wishVal,
+      };
     });
     return result2;
   }
@@ -85,30 +129,39 @@ export class HouseService {
 
   async findHouse({ house_id, reqUser = null}) {
     let userResult;
-
+    let wishVal;
     if(reqUser){
       const { user_auth_id, auth_method } = reqUser;
       userResult = await this.userRepository.findOne({
         where: { user_auth_id: user_auth_id, auth_method: auth_method },
       });
     }else{
-      userResult = {id:null};
+      userResult = {id:0};
     }
 
     let result = await this.houseRepository.findOne({
-      where: { id: house_id,  },
+      where: { id: house_id},
       relations: [
         'house_location',
         'house_cost',
         'house_category',
         'region',
         'imgs',
-        'wish_users',
       ],
     });
 
+    let isWish = await this.houseRepository.findOne({
+      where: {id: house_id, wish_users: {id : userResult.id}},
+      relations:[
+        'wish_users',
+      ]
+    })
 
-
+    if(isWish){
+      wishVal = 1;
+    }else{
+      wishVal = 0;
+    }
 
     if (result.is_crolled) {
       return {
@@ -136,9 +189,36 @@ export class HouseService {
         region: {
           id: 123,
         },
+        is_wished : wishVal,
       };
     } else {
-      return result;
+      return {
+        id: result.id,
+        contact_number: result.contact_number,
+        is_crolled: result.is_crolled,
+        gender: result.gender,
+        house_other_info: result.house_other_info,
+        has_emtpy: result.has_empty,
+        imgs: result.imgs,
+        board_date: result.board_date,
+        house_location: {
+          latitude: result.house_location.latitude,
+          longitude: result.house_location.longitude,
+        },
+        house_cost: {
+          month_cost: result.house_cost.month_cost,
+          deposit: result.house_cost.deposit,
+          other_info: result.house_cost.other_info,
+        },
+        house_category: {
+          name: result.house_category.name,
+          id: result.house_category.id,
+        },
+        region: {
+          id: result.id,
+        },
+        is_wished : wishVal,
+      };
     }
   }
 

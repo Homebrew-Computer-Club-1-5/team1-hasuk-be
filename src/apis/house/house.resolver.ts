@@ -15,7 +15,7 @@ import { UpdateMyHouseInput } from './dto/updateMyHouse/updateMyHouse.input';
 import { FetchCrawledHousesOutput } from './dto/fetchCrawledHouses/fetchCrawledHouses.output';
 import { House_img } from 'src/db_entity/house_img/entities/house_img.entity';
 import { FetchHouseOutput } from './dto/fetchHouse/fetchHouse.output';
-import { fetchAllHousesOutput } from './dto/fetchAllHouses/fetchAllHouses.output';
+import { fetchAllHousesOutput } from './dto/fetchAllHousesGroupedByRegion/fetchAllHouses.output';
 import { FetchUpOutput } from './dto/fetchUp/fetchUp.output';
 import { fetchHousesByRegionLoginedOutput } from './dto/fetchHousesByRegionLogined/fetchHousesByRegionLogined.output';
 import { FetchMyWishHousesOutput } from './dto/fetchMyWishHouses/fetchMyWishHouses.output';
@@ -45,13 +45,13 @@ export class HouseResolver {
     @Args('region_id') region_id: number) {
     return this.houseService.findAllHousesByRegion({ region_id, reqUser });
   }
-
+  
   //특정 집 정보 가져오기
   @Query(() => FetchHouseOutput)
   fetchHouse(@Args('house_id') house_id: number) {
     return this.houseService.findHouse({ house_id });
   }
-
+  
   @UseGuards(GqlAuthAccessGuard)
   @Query(() => FetchHouseLoginedOutput)
   fetchHouseLogined(
@@ -63,7 +63,15 @@ export class HouseResolver {
 
   @Query(() => [House])
   async fetchAllHouses() {
-    return this.houseService.findAllHouses();
+    return this.houseService.findAllHouses({});
+  }
+
+  @UseGuards(GqlAuthAccessGuard)
+  @Query(() => [House])
+  async fetchAllHousesLogined(
+    @ReqUser() reqUser: IreqUser
+  ){
+    return this.houseService.findAllHouses({reqUser});
   }
 
   @UseGuards(GqlAuthAccessGuard)
