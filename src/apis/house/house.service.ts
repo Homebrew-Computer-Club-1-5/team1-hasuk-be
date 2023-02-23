@@ -277,11 +277,11 @@ export class HouseService {
   }
 
   async findMyWishHouses({ reqUser }) {
-    // const { user_auth_id, auth_method } = reqUser;
+    const { user_auth_id, auth_method } = reqUser;
     // 1. reqUser로 유저 조회
-    // const userResult = await this.userRepository.findOne({
-    //   where: { user_auth_id: user_auth_id, auth_method: auth_method },
-    // });
+    const userResult = await this.userRepository.findOne({
+      where: { user_auth_id: user_auth_id, auth_method: auth_method },
+    });
 
     // 2. tb_house_user에서 house들 모두 조회
     const house_userResult = await this.userRepository.findOne({
