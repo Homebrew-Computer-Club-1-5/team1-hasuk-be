@@ -15,18 +15,19 @@ import { UpdateMyHouseInput } from './dto/updateMyHouse/updateMyHouse.input';
 import { FetchCrawledHousesOutput } from './dto/fetchCrawledHouses/fetchCrawledHouses.output';
 import { House_img } from 'src/db_entity/house_img/entities/house_img.entity';
 import { FetchHouseOutput } from './dto/fetchHouse/fetchHouse.output';
-import { fetchAllHousesOutput } from './dto/fetchAllHousesGroupedByRegion/fetchAllHouses.output';
+import { fetchAllHousesGroupedByRegionOutput } from './dto/fetchAllHousesGroupedByRegion/fetchAllHouses.output';
 import { FetchUpOutput } from './dto/fetchUp/fetchUp.output';
 import { fetchHousesByRegionLoginedOutput } from './dto/fetchHousesByRegionLogined/fetchHousesByRegionLogined.output';
 import { FetchMyWishHousesOutput } from './dto/fetchMyWishHouses/fetchMyWishHouses.output';
 import { FetchHouseLoginedOutput } from './dto/fetchHouseLogined/fetchHouseLogined.output';
+import { fetchAllHouses } from './dto/fetchAllHouses/fetchAllHouses.ouput';
 
 @Resolver()
 export class HouseResolver {
   constructor(private readonly houseService: HouseService) {}
 
   //모든부근의 모든 집 정보를 가져오기
-  @Query(() => [fetchAllHousesOutput])
+  @Query(() => [fetchAllHousesGroupedByRegionOutput])
   fetchAllHousesGroupedByRegion() {
     return this.houseService.findAllHousesGroupedByRegion();
   }
@@ -61,13 +62,13 @@ export class HouseResolver {
     return this.houseService.findHouse({ house_id, reqUser });
   }
 
-  @Query(() => [House])
+  @Query(() => [fetchAllHouses])
   async fetchAllHouses() {
     return this.houseService.findAllHouses({});
   }
 
   @UseGuards(GqlAuthAccessGuard)
-  @Query(() => [House])
+  @Query(() => [fetchAllHouses])
   async fetchAllHousesLogined(
     @ReqUser() reqUser: IreqUser
   ){
@@ -100,9 +101,12 @@ export class HouseResolver {
     return await this.houseService.findMyHouses({ reqUser });
   }
 
-  @UseGuards(GqlAuthAccessGuard)
+  // @UseGuards(GqlAuthAccessGuard)
   @Query(() => [FetchMyWishHousesOutput])
-  async fetchMyWishHouses(@ReqUser() reqUser: IreqUser) {
+  async fetchMyWishHouses(
+    // @ReqUser() reqUser: IreqUser
+    ) {
+    let reqUser = {id:1}
     return await this.houseService.findMyWishHouses({ reqUser });
   }
 

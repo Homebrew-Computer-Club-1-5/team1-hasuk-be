@@ -71,34 +71,9 @@ export class HouseService {
           'wish_users',
         ]
       })
-      let wishVal;
-      if(isWish){
-        wishVal = 1;
-      }else{
-        wishVal = 0;
-      }
-      return {
-        id : each.id,
-        contact_number : each.contact_number,
-        gender : each.gender,
-        house_other_info : each.house_other_info,
-        has_empty : each.has_empty,
-        is_crolled : each.is_crolled,
-        board_date : each.board_date,
-        house_cost : each.house_cost,
-        house_location : each.house_location,
-        house_category : {
-          id: each.house_category.id,
-          name : each.house_category.name,
-        },
-        region : {
-          id : each.region.id,
-          name : each.region.name,
-        },
-        imgs : each.imgs,
-        ups : each.ups,
-        is_wished : wishVal,
-      };
+      let wishVal = (isWish ? 1 : 0);
+
+      return {...each, is_wished: wishVal};
     });
     return result2;
   }
@@ -157,12 +132,8 @@ export class HouseService {
       ]
     })
 
-    if(isWish){
-      wishVal = 1;
-    }else{
-      wishVal = 0;
-    }
-
+    wishVal = (isWish ? 1 : 0);
+    
     if (result.is_crolled) {
       return {
         id: result.id,
@@ -192,33 +163,7 @@ export class HouseService {
         is_wished : wishVal,
       };
     } else {
-      return {
-        id: result.id,
-        contact_number: result.contact_number,
-        is_crolled: result.is_crolled,
-        gender: result.gender,
-        house_other_info: result.house_other_info,
-        has_emtpy: result.has_empty,
-        imgs: result.imgs,
-        board_date: result.board_date,
-        house_location: {
-          latitude: result.house_location.latitude,
-          longitude: result.house_location.longitude,
-        },
-        house_cost: {
-          month_cost: result.house_cost.month_cost,
-          deposit: result.house_cost.deposit,
-          other_info: result.house_cost.other_info,
-        },
-        house_category: {
-          name: result.house_category.name,
-          id: result.house_category.id,
-        },
-        region: {
-          id: result.id,
-        },
-        is_wished : wishVal,
-      };
+      return {...result, is_wished : wishVal};
     }
   }
 
@@ -332,20 +277,20 @@ export class HouseService {
   }
 
   async findMyWishHouses({ reqUser }) {
-    const { user_auth_id, auth_method } = reqUser;
+    // const { user_auth_id, auth_method } = reqUser;
     // 1. reqUser로 유저 조회
-    const userResult = await this.userRepository.findOne({
-      where: { user_auth_id: user_auth_id, auth_method: auth_method },
-    });
+    // const userResult = await this.userRepository.findOne({
+    //   where: { user_auth_id: user_auth_id, auth_method: auth_method },
+    // });
 
     // 2. tb_house_user에서 house들 모두 조회
     const house_userResult = await this.userRepository.findOne({
-      where: { id: userResult.id },
+      where: { id: 1 },
       relations: ['wish_houses'],
     });
 
     // 거기서 house_id들만 뽑아내기
-    const house_ids = house_userResult.houses.map((house) => house.id);
+    const house_ids = house_userResult.wish_houses.map((house) => house.id);
 
     // house_id마다의 house_location_ids, house_img_ids 추출
     const house_img_ids: number[][] = [];
@@ -400,7 +345,7 @@ export class HouseService {
     }
 
     const lastResult = house_ids.map((house_id) => {
-      const result1 = house_userResult.houses.find(
+      const result1 = house_userResult.wish_houses.find(
         (house) => house.id === house_id,
       );
 

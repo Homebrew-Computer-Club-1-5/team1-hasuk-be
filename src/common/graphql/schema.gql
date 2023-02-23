@@ -184,7 +184,7 @@ type UniversitiyOutput {
   name: String!
 }
 
-type fetchAllHousesOutput {
+type fetchAllHousesGroupedByRegionOutput {
   id: Int!
   name: String
   universities: UniversitiyOutput!
@@ -239,6 +239,23 @@ type FetchHouseLoginedOutput {
   is_wished: Int
 }
 
+type fetchAllHouses {
+  id: Int
+  contact_number: String
+  gender: Int
+  house_other_info: String
+  has_empty: Int
+  is_crolled: Int
+  board_date: Float
+  house_cost: House_cost
+  house_location: House_location!
+  house_category: House_category
+  region: Region
+  imgs: [House_img]!
+  ups: [Up]!
+  is_wished: Int!
+}
+
 type Main_spot_locationOutput {
   id: Int!
   latitude: Float!
@@ -258,13 +275,13 @@ type FetchUpOutput {
 
 type Query {
   fetchMainSpots: [FetchMainSpotsOutput!]!
-  fetchAllHousesGroupedByRegion: [fetchAllHousesOutput!]!
+  fetchAllHousesGroupedByRegion: [fetchAllHousesGroupedByRegionOutput!]!
   fetchHousesByRegion(region_id: Float!): [fetchHousesByRegionOutput!]!
   fetchHousesByRegionLogined(region_id: Float!): [fetchHousesByRegionLoginedOutput!]!
   fetchHouse(house_id: Float!): FetchHouseOutput!
   fetchHouseLogined(house_id: Float!): FetchHouseLoginedOutput!
-  fetchAllHouses: [House!]!
-  fetchAllHousesLogined: [House!]!
+  fetchAllHouses: [fetchAllHouses!]!
+  fetchAllHousesLogined: [fetchAllHouses!]!
   fetchHouseByLocation(location: House_locationInput!): Float!
   fetchMyHouse: [FetchMyHouseOutput!]!
   fetchMyWishHouses: [FetchMyWishHousesOutput!]!
