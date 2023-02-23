@@ -10,7 +10,7 @@ class House_costExceptId extends OmitType(House_cost, ['id']) {}
 
 @ObjectType()
 export class FetchMyHouseOutput {
-  @Field(() => [String])
+  @Field(() => [String], { nullable: true })
   img_urls: string[];
 
   @Field(() => Int)
@@ -19,24 +19,24 @@ export class FetchMyHouseOutput {
   @Field(() => String)
   contact_number: string;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   gender: number;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   house_other_info: string;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   region: number;
 
-  @Field(() => House_costExceptId)
+  @Field(() => House_costExceptId, { nullable: true })
   cost: House_costExceptId;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   house_category: number;
 
-  @Field(() => House_locationExceptId)
+  @Field(() => House_locationExceptId, { nullable: true })
   location: House_locationExceptId;
 
-  @Field(() => Number)
+  @Field(() => Number, { nullable: true })
   board_date: number;
 }

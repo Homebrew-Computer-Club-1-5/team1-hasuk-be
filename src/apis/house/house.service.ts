@@ -330,16 +330,16 @@ export class HouseService {
       });
       house_etcResults.push({
         id: house_id,
-        region: houseResult.region.id,
+        region: (houseResult.region? houseResult.region.id : null),
         cost: {
-          month_cost: houseResult.house_cost.month_cost,
-          deposit: houseResult.house_cost.deposit,
-          other_info: houseResult.house_cost.other_info,
+          month_cost: (houseResult.house_cost? houseResult.house_cost.month_cost : null),
+          deposit: (houseResult.house_cost? houseResult.house_cost.deposit : null),
+          other_info: (houseResult.house_cost? houseResult.house_cost.other_info : null),
         },
-        house_category: houseResult.house_category.id,
+        house_category: (houseResult.house_category? houseResult.house_category.id : null),
         house_location: {
-          latitude: houseResult.house_location.latitude,
-          longitude: houseResult.house_location.longitude,
+          latitude: (houseResult.house_location? houseResult.house_location.latitude : null),
+          longitude: (houseResult.house_location? houseResult.house_location.longitude : null),
         },
       });
     }

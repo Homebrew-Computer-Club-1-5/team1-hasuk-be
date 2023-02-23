@@ -4,7 +4,7 @@
 
 type House_cost {
   id: Int!
-  month_cost: Int!
+  month_cost: Int
   deposit: Int
   other_info: String
 }
@@ -109,22 +109,22 @@ type House_locationExceptId {
 }
 
 type House_costExceptId {
-  month_cost: Int!
+  month_cost: Int
   deposit: Int
   other_info: String
 }
 
 type FetchMyHouseOutput {
-  img_urls: [String!]!
+  img_urls: [String!]
   id: Int!
   contact_number: String!
-  gender: Int!
-  house_other_info: String!
-  region: Int!
-  cost: House_costExceptId!
-  house_category: Int!
-  location: House_locationExceptId!
-  board_date: Float!
+  gender: Int
+  house_other_info: String
+  region: Int
+  cost: House_costExceptId
+  house_category: Int
+  location: House_locationExceptId
+  board_date: Float
 }
 
 type FetchCrawledHousesOutput {
@@ -210,16 +210,16 @@ type fetchHousesByRegionLoginedOutput {
 }
 
 type FetchMyWishHousesOutput {
-  img_urls: [String!]!
+  img_urls: [String!]
   id: Int!
   contact_number: String!
-  gender: Int!
-  house_other_info: String!
-  region: Int!
-  cost: House_costExceptId!
-  house_category: Int!
-  location: House_locationExceptId!
-  board_date: Float!
+  gender: Int
+  house_other_info: String
+  region: Int
+  cost: House_costExceptId
+  house_category: Int
+  location: House_locationExceptId
+  board_date: Float
 }
 
 type FetchHouseLoginedOutput {
@@ -319,7 +319,7 @@ input HouseInput {
 }
 
 input House_costInput {
-  month_cost: Int!
+  month_cost: Int
   deposit: Int
   other_info: String
 }

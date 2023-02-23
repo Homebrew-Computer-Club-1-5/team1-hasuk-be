@@ -9,7 +9,7 @@ export class House_cost {
   id: number;
 
   @Column()
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   month_cost: number;
 
   @Column({ nullable: true })
