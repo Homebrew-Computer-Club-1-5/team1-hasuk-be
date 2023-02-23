@@ -101,12 +101,11 @@ export class HouseResolver {
     return await this.houseService.findMyHouses({ reqUser });
   }
 
-  // @UseGuards(GqlAuthAccessGuard)
+  @UseGuards(GqlAuthAccessGuard)
   @Query(() => [FetchMyWishHousesOutput])
   async fetchMyWishHouses(
-    // @ReqUser() reqUser: IreqUser
+    @ReqUser() reqUser: IreqUser
     ) {
-    let reqUser = {id:1}
     return await this.houseService.findMyWishHouses({ reqUser });
   }
 
