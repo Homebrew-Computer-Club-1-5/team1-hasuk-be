@@ -285,7 +285,7 @@ export class HouseService {
 
     // 2. tb_house_user에서 house들 모두 조회
     const house_userResult = await this.userRepository.findOne({
-      where: { id: 1 },
+      where: { id: userResult.id },
       relations: ['wish_houses'],
     });
 
