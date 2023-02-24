@@ -4,7 +4,7 @@ import { HouseOutput } from './fetchAllHouses_house.output';
 import { UniversitiyOutput } from './fetchAllHouse_univiersity.output';
 
 @ObjectType()
-export class fetchAllHousesOutput extends OmitType(Region, [
+export class fetchAllHousesGroupedByRegionOutput extends OmitType(Region, [
   'universities',
   'houses',
 ]) {
