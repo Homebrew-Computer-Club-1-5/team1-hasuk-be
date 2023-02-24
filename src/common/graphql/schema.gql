@@ -300,6 +300,8 @@ type Mutation {
   updateMyHouse(updateMyHouseInput: UpdateMyHouseInput!): Int!
   updateWishHouse(house_id: Float!): Int!
   crawl(latestBoardDateByArg: Float!): String!
+  crawlKoreaPas: String!
+  crawlKoreaDormitory(untilYear: Float!, untilMonth: Float!, untilDate: Float!): String!
   fetchUp(house_id: Float!): FetchUpOutput!
 }
 

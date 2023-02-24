@@ -48,6 +48,7 @@ export class User {
   })
   @ManyToMany(() => House, (house) => house.wish_users)
   @Field(() => [House], {nullable: true})
+
   wish_houses: House[];
 
   @OneToMany(() => Up, (ups) => ups.user)

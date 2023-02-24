@@ -5,7 +5,20 @@ import { CrawlService } from './crawl.service';
 export class CrawlResolver {
   constructor(private readonly crawlService: CrawlService) {}
   @Mutation(() => String)
-  async crawl(@Args('latestBoardDateByArg') latestBoardDateByArg: number) {
-    return await this.crawlService.crawl();
+  async crawlKoreaPas() {
+    return await this.crawlService.crawlKoreaPas();
+  }
+
+  @Mutation(() => String)
+  async crawlKoreaDormitory(
+    @Args('untilYear') untilYear: number,
+    @Args('untilMonth') untilMonth: number,
+    @Args('untilDate') untilDate: number,
+  ) {
+    return await this.crawlService.crawlKoreaUniversityDormitory({
+      year: untilYear,
+      month: untilMonth,
+      date: untilDate,
+    });
   }
 }

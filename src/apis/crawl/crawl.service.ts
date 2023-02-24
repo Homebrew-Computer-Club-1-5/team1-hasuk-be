@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { crawl } from './functions/crawl';
+import { crawlKoreaPas } from './koreaPas/crawl';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { HttpService } from '@nestjs/axios';
 import { createWriteStream } from 'fs';
 import { Storage } from '@google-cloud/storage';
 import { v1 } from 'uuid';
+import { crawlKoreaUniversityDormitory } from './dormitory/crawl';
 
 const boardInfos = [
   {
@@ -44,7 +45,7 @@ export class CrawlService {
     private dataSource: DataSource,
   ) {}
 
-  async findLatestBoardDate(category_id) {
+  async findLatestBoardDateByCategoryId(category_id) {
     console.log('db에서 최신게시물날짜 조회중');
 
     let result: number;
@@ -68,7 +69,7 @@ export class CrawlService {
       [Date.now()],
     );
 
-    console.log('2주이전 데이터 갱신 완료');
+    console.log('2주이전 크롤링 데이터 삭제 완료');
 
     return;
   }
@@ -137,7 +138,7 @@ export class CrawlService {
         const storage = new Storage({
           projectId: 'board-373207',
           keyFilename: 'board-373207-a02f17b5865d.json',
-        }).bucket(process.env.STORAGE);
+        }).bucket(process.env.GOOGLE_IMAGE_STORAGE);
 
         const results = await Promise.all(
           homeImgUrls.map((el) => {
@@ -154,7 +155,7 @@ export class CrawlService {
                   'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
                   [
                     'https://storage.googleapis.com/' +
-                      process.env.STORAGE +
+                      process.env.GOOGLE_IMAGE_STORAGE +
                       '/' +
                       uuid +
                       '.jpg',
@@ -166,7 +167,7 @@ export class CrawlService {
                 response.data
                   .pipe(storage.file(uuid + '.jpg').createWriteStream())
                   .on('finish', () => {
-                    resolve(`${process.env.STORAGE}/${uuid}.jpg`);
+                    resolve(`${process.env.GOOGLE_IMAGE_STORAGE}/${uuid}.jpg`);
                   })
                   .on('error', () => {
                     reject();
@@ -177,7 +178,7 @@ export class CrawlService {
                   'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
                   [
                     'https://storage.googleapis.com/' +
-                      process.env.STORAGE +
+                      process.env.GOOGLE_IMAGE_STORAGE +
                       '/' +
                       uuid +
                       '.jpg',
@@ -189,7 +190,7 @@ export class CrawlService {
                 response.data
                   .pipe(storage.file(uuid + '.jpg').createWriteStream())
                   .on('finish', () => {
-                    resolve(`${process.env.STORAGE}/${uuid}.jpg`);
+                    resolve(`${process.env.GOOGLE_IMAGE_STORAGE}/${uuid}.jpg`);
                   })
                   .on('error', () => {
                     reject();
@@ -207,116 +208,60 @@ export class CrawlService {
 
   // @Cron(`*/40 * * * * *`, {
   // @Cron(`0 */1 * * * * *`, {
-  @Cron(`0 0 0,3,6,9,12,15,18,21 * * *`, {
-    // @Cron(`0 */2 * * * *`, {
-    name: 'crawl',
-    timeZone: 'Asia/Seoul',
-  })
-  async crawl() {
+  // @Cron(`0 0 0,3,6,9,12,15,18,21 * * *`, {
+  //   // @Cron(`0 */2 * * * *`, {
+  //   name: 'crawl',
+  //   timeZone: 'Asia/Seoul',
+  // })
+  async crawlKoreaPas() {
     console.log(
-      '====================== Crawl init ===========================',
+      '====================== KoreaPas Crawl init ===========================',
     );
-    // 1. deprecated crawled data 관리
     await this.mangeDeprecatedCrawledData();
 
-    // 2. latest board date 찾기
-    // const latestBoardDate = await this.findLatestBoardDate();
-
+    let result = [];
     for await (const boardInfo of boardInfos) {
       console.log(`${boardInfo.board_name} 게시판 latestBoardDate 조회 `);
       // 1. latestBoardDate DB에서 조회
-      const latestBoardDate = await this.findLatestBoardDate(
+      const latestBoardDate = await this.findLatestBoardDateByCategoryId(
         boardInfo.house_category_id,
-      ); // 여기 인자로 house_category_id 들어가야함
-      // const latestBoardDate = 1674117774000;
-      const result = await crawl(
-        {
-          latestBoardDate: latestBoardDate,
-          contactNumberRegExp: /\d{2,3}(-|\.|\s*)\d{3,4}(-|\.|\s*)\d{3,4}/gm,
-          boardUrl: boardInfo.url,
-          house_category_id: boardInfo.house_category_id,
-        },
-        {
-          id: process.env.CRAWL_KOREAPAS_ID,
-          pw: process.env.CRAWL_KOREAPAS_PW,
-        },
       );
-      console.log(result);
-      // 4. DB 업데이트
-      await this.updateDB(result, boardInfo.house_category_id);
+
+      const crawlUntil = new Date(latestBoardDate);
+
+      const boardResult = await crawlKoreaPas({
+        crawlUntil,
+        boardUrl: boardInfo.url,
+        house_category_id: boardInfo.house_category_id,
+      });
+      result.push(boardResult);
+      await this.updateDB(boardResult, boardInfo.house_category_id);
     }
 
     console.log(
-      '====================== Crawl complete ===========================',
+      '====================== KoreaPas Crawl complete ===========================',
     );
+    return 'crawl complete';
   }
 
-  // 3번단계 - .map으로 DB UPDATE / INSERT 하면됨
+  async crawlKoreaUniversityDormitory({ year, month, date }) {
+    console.log(
+      '====================== KoreaUniversityDormitory Crawl init ===========================',
+    );
+    const result = await crawlKoreaUniversityDormitory({
+      crawlUntil: new Date(year, month - 1, date),
+    });
+    console.log(
+      '====================== KoreaUniversityDormitory Crawl Complete ===========================',
+    );
+    console.log(result);
+    return result;
+  }
+  //
 
-  // for (let i = 0; i < result.length; i++) {
-  //   const boardId = result[i].boardId;
-  //   const boardDate = result[i].boardDate;
-  //   const contactNumber = result[i].contactNumber;
-  //   const homeImgUrls = result[i].homeImgUrls;
-  //   const otherInfo = result[i].otherInfo;
-  //   let house_id;
+  //
 
-  //   console.log('조회중인 전화번호 : ' + contactNumber);
-  //   //1. 전화번호 조회
-  //   await this.dataSource
-  //     .query('SELECT id, FROM tb_house WHERE contact_number = ? ', [
-  //       contactNumber,
-  //     ])
-  //     .then((prom) => {
-  //       console.log(prom);
-  //       if (prom[0]) {
-  //         house_id = prom[0].id;
-  //       }
-  //     });
+  //
 
-  //   console.log('house_id : ' + house_id);
-
-  //   //2. 전화번호가 있으면 update
-  //   if (house_id) {
-  //     //크롤링 했던게 아니므로 boardDate, other_info, imgs, isColled , (has_empty)
-  //     this.dataSource.query(
-  //       'UPDATE tb_house SET house_other_info = ?, has_empty = 1, is_crolled = 1, board_date = ? WHERE id = ? and is_crolled != 1 ',
-  //       [otherInfo, boardDate, house_id],
-  //     );
-  //     this.dataSource.query('DELETE FROM tb_house_img WHERE house_id = ? ', [
-  //       house_id,
-  //     ]);
-  //     //이미지들 삽입
-  //     for (let j = 0; j < homeImgUrls.length; j++) {
-  //       this.dataSource.query(
-  //         'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
-  //         [homeImgUrls[j], house_id],
-  //       );
-  //     }
-  //   } else {
-  //     //3. 전화번호가 없으면 insert
-  //     await this.dataSource.query(
-  //       'INSERT INTO tb_house (house_other_info, has_empty, cost_id, house_location_id, house_category_id, region_id, is_crolled, contact_number, gender, board_date) VALUES (?, 1, null, null, null, null, 1, ?, null, ?) ',
-  //       [otherInfo, contactNumber, boardDate],
-  //     );
-  //     await this.dataSource
-  //       .query('SELECT id FROM tb_house WHERE contact_number = ? ', [
-  //         contactNumber,
-  //       ])
-  //       .then((prom) => {
-  //         console.log(prom);
-  //         if (prom[0]) {
-  //           house_id = prom[0].id;
-  //         }
-  //       });
-  //     //이미지들 삽입
-  //     for (let j = 0; j < homeImgUrls.length; j++) {
-  //       this.dataSource.query(
-  //         'INSERT INTO tb_house_img (img_url, house_id) VALUES (?, ?) ',
-  //         [homeImgUrls[j], house_id],
-  //       );
-  //     }
-  //   }
-  // }
-  // }
+  async crawlAllDormitory() {}
 }
