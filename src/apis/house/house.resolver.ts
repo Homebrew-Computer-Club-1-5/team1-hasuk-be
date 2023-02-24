@@ -41,8 +41,12 @@ export class HouseResolver {
   @Query(() => [fetchHousesByRegionLoginedOutput])
   fetchHousesByRegionLogined(
     @ReqUser() reqUser: IreqUser,
-    @Args('region_id') region_id: number) {
-    return this.houseService.findAllHousesByRegionLogined({ region_id, reqUser });
+    @Args('region_id') region_id: number,
+  ) {
+    return this.houseService.findAllHousesByRegionLogined({
+      region_id,
+      reqUser,
+    });
   }
 
   //특정 집 정보 가져오기

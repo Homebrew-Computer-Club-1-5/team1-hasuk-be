@@ -247,7 +247,8 @@ type Mutation {
   createHouse(createHouseInput: CreateHouseInput!): String!
   deleteMyHouse(house_id: Float!): String!
   updateMyHouse(updateMyHouseInput: UpdateMyHouseInput!): Int!
-  crawl(latestBoardDateByArg: Float!): String!
+  crawlKoreaPas: String!
+  crawlKoreaDormitory(untilYear: Float!, untilMonth: Float!, untilDate: Float!): String!
   fetchUp(house_id: Float!): FetchUpOutput!
 }
 
