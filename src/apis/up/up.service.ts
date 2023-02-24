@@ -5,7 +5,7 @@ import { House } from 'src/db_entity/house/entities/house.entity';
 import { Up } from 'src/db_entity/up/entities/up.entity';
 import { User } from 'src/db_entity/user/entities/user.entity';
 import { LessThan, MoreThan, Repository } from 'typeorm';
-import { toTimestamp } from '../crawl/functions/crawl';
+import { toTimestamp } from '../crawl/koreaPas/util';
 
 @Injectable()
 export class UpService {

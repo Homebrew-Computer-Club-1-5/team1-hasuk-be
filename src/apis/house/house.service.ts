@@ -11,8 +11,6 @@ import { House_img } from '../../db_entity/house_img/entities/house_img.entity';
 import { HttpService } from '@nestjs/axios';
 import { Storage } from '@google-cloud/storage';
 import { v1 } from 'uuid';
-import { Up } from 'src/db_entity/up/entities/up.entity';
-import { toTimestamp } from '../crawl/functions/crawl';
 
 @Injectable()
 export class HouseService {
@@ -147,6 +145,7 @@ export class HouseService {
       where: { id: userResult.id },
       relations: ['houses'],
     });
+    console.log(house_userResult);
 
     // 거기서 house_id들만 뽑아내기
     const house_ids = house_userResult.houses.map((house) => house.id);
@@ -272,7 +271,7 @@ export class HouseService {
       const storage = new Storage({
         projectId: 'board-373207',
         keyFilename: 'board-373207-a02f17b5865d.json',
-      }).bucket(process.env.STORAGE);
+      }).bucket(process.env.GOOGLE_IMAGE_STORAGE);
 
       const result4 = await this.house_imgRepository.find({
         where: { house: { id: house_id } },
@@ -364,7 +363,7 @@ export class HouseService {
     const storage = new Storage({
       projectId: 'board-373207',
       keyFilename: 'board-373207-a02f17b5865d.json',
-    }).bucket(process.env.STORAGE);
+    }).bucket(process.env.GOOGLE_IMAGE_STORAGE);
 
     await Promise.all(
       waitedFiles.map((el) => {
@@ -373,7 +372,7 @@ export class HouseService {
           try {
             img_urls.push(
               'https://storage.googleapis.com/' +
-                process.env.STORAGE +
+                process.env.GOOGLE_IMAGE_STORAGE +
                 '/' +
                 uuid +
                 '.jpg',
@@ -382,7 +381,7 @@ export class HouseService {
             el.createReadStream()
               .pipe(storage.file(uuid + '.jpg').createWriteStream())
               .on('finish', () => {
-                resolve(`${process.env.STORAGE}/${uuid}.jpg`);
+                resolve(`${process.env.GOOGLE_IMAGE_STORAGE}/${uuid}.jpg`);
               })
               .on('error', () => {
                 reject();
@@ -471,7 +470,7 @@ export class HouseService {
     const storage = new Storage({
       projectId: 'board-373207',
       keyFilename: 'board-373207-a02f17b5865d.json',
-    }).bucket(process.env.STORAGE);
+    }).bucket(process.env.GOOGLE_IMAGE_STORAGE);
     const result4 = await this.house_imgRepository.find({
       where: { house: { id: house_id }, img_url: Not(In(rest.googleLinks)) },
       relations: ['house'],
@@ -497,7 +496,7 @@ export class HouseService {
           try {
             img_urls.push(
               'https://storage.googleapis.com/' +
-                process.env.STORAGE +
+                process.env.GOOGLE_IMAGE_STORAGE +
                 '/' +
                 uuid +
                 '.jpg',
@@ -506,7 +505,7 @@ export class HouseService {
             el.createReadStream()
               .pipe(storage.file(uuid + '.jpg').createWriteStream())
               .on('finish', () => {
-                resolve(`${process.env.STORAGE}/${uuid}.jpg`);
+                resolve(`${process.env.GOOGLE_IMAGE_STORAGE}/${uuid}.jpg`);
               })
               .on('error', () => {
                 reject();

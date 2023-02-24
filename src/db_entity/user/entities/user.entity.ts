@@ -46,7 +46,7 @@ export class User {
     joinColumns: [{ name: 'user_id' }],
     inverseJoinColumns: [{ name: 'house_id' }],
   })
-  @ManyToMany(() => House, (house) => house.users)
+  @ManyToMany(() => House, (house) => house.wish_users)
   @Field(() => [House])
   wish_houses: House[];
 
