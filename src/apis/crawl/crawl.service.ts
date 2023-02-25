@@ -8,6 +8,8 @@ import { createWriteStream } from 'fs';
 import { Storage } from '@google-cloud/storage';
 import { v1 } from 'uuid';
 import { crawlKoreaUniversityDormitory } from './dormitory/crawl';
+import { crawlGumiHakSukDormitory } from './dormitory/gumiHakSuk/crawl';
+import { crawlNamMeoungDormitory } from './dormitory/namMeoung/crawl';
 
 const boardInfos = [
   {
@@ -244,21 +246,44 @@ export class CrawlService {
     return 'crawl complete';
   }
 
-  async crawlKoreaUniversityDormitory({ year, month, date }) {
+  async crawlKoreaUniversityDormitory({ untilYear, untilMonth, untilDate }) {
     console.log(
       '====================== KoreaUniversityDormitory Crawl init ===========================',
     );
     const result = await crawlKoreaUniversityDormitory({
-      crawlUntil: new Date(year, month - 1, date),
+      crawlUntil: new Date(untilYear, untilMonth - 1, untilDate),
     });
     console.log(
       '====================== KoreaUniversityDormitory Crawl Complete ===========================',
     );
-    console.log(result);
     return result;
   }
   //
+  async crawlNamMeoungDormitory({ untilYear, untilMonth, untilDate }) {
+    console.log(
+      '====================== NamMeoungDormitory Crawl init ===========================',
+    );
+    const result = await crawlNamMeoungDormitory({
+      crawlUntil: new Date(untilYear, untilMonth - 1, untilDate),
+    });
+    console.log(
+      '====================== NamMeoungDormitory Crawl Complete ===========================',
+    );
+    return result;
+  }
 
+  async crawlGumiHakSukDormitory({ untilYear, untilMonth, untilDate }) {
+    console.log(
+      '====================== GumiHakSukDormitory Crawl init ===========================',
+    );
+    const result = await crawlGumiHakSukDormitory({
+      crawlUntil: new Date(untilYear, untilMonth - 1, untilDate),
+    });
+    console.log(
+      '====================== GumiHakSukDormitory Crawl Complete ===========================',
+    );
+    return result;
+  }
   //
 
   //
