@@ -59,10 +59,8 @@ import * as Joi from 'joi';
       autoSchemaFile: 'src/common/graphql/schema.gql',
       cors: {
         origin: process.env.CLIENT_URL,
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-        allowedHeaders:
-          'Content-Type,Accept,Authorization,Access-Control-Allow-Origin',
       },
     }),
     TypeOrmModule.forRoot({

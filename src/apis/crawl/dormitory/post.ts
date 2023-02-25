@@ -1,35 +1,31 @@
 import { ElementHandle } from 'puppeteer';
+import { IcrawlPostResult } from './types';
 import { stringToDateObject } from './util';
 
 interface IgetResults {
   posts: ElementHandle<HTMLTableRowElement>[];
 }
 
-interface Iresult {
-  title: string;
-  boardDate: Date;
-  postLink: string;
-}
 export async function getResults({ posts }) {
-  const result: Iresult[] = [];
+  const result: IcrawlPostResult[] = [];
   for (let i = 0; i < posts.length; i++) {
     const postHandleElement = posts[i];
     const boardDateString = await postHandleElement.$eval(
       'td.date',
       (element) => element.textContent,
     );
-    const boardDate = stringToDateObject(boardDateString);
+    const postDate = stringToDateObject(boardDateString);
 
-    const title = await postHandleElement.$eval(
-      'td.title > a',
+    const postTitle = await postHandleElement.$eval(
+      'td.postTitle > a',
       (element) => element.textContent,
     );
 
     const postLink = await postHandleElement.$eval(
-      'td.title > a',
+      'td.postTitle > a',
       (element) => element.href,
     );
-    result.push({ title, boardDate, postLink });
+    result.push({ postTitle, postDate, postLink });
   }
   return result;
 }
