@@ -47,4 +47,19 @@ export class CrawlResolver {
       untilDate,
     });
   }
+
+  @Mutation(() => String)
+  async crawlAllDormitory(
+    @Args('untilYear') untilYear: number,
+    @Args('untilMonth') untilMonth: number,
+    @Args('untilDate') untilDate: number,
+  ) {
+    return await this.crawlService.crawlAllDormitory({
+      untilYear,
+      untilMonth,
+      untilDate,
+    });
+  }
+
+
 }
