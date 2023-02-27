@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { crawlKoreaPas } from './koreaPas/crawl';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { HttpService } from '@nestjs/axios';
 import { createWriteStream } from 'fs';
 import { Storage } from '@google-cloud/storage';
@@ -10,7 +10,8 @@ import { v1 } from 'uuid';
 import { crawlKoreaUniversityDormitory } from './dormitory/crawl';
 import { crawlGumiHakSukDormitory } from './dormitory/gumiHakSuk/crawl';
 import { crawlNamMeoungDormitory } from './dormitory/namMeoung/crawl';
-
+import { CalendarService } from '../calendar/calendar.service';
+import { Calendar } from 'src/db_entity/calendar/entities/calendar.entity';
 const boardInfos = [
   {
     board_name: '일반',
@@ -43,6 +44,8 @@ const boardInfos = [
 export class CrawlService {
   constructor(
     private readonly httpService: HttpService,
+    @InjectRepository(Calendar)
+    private readonly calendar_repository: Repository<Calendar>,
     @InjectDataSource()
     private dataSource: DataSource,
   ) {}
@@ -288,5 +291,27 @@ export class CrawlService {
 
   //
 
-  async crawlAllDormitory() {}
+  async calendarUpdateDB(result, dormitory_id){
+    
+    for(let i = 0; i< result.length; i++){
+        const postTitle = result[i].postTitle;
+        const postDate = result[i].postDate;
+        const postLink = result[i].postLink;
+        
+        await this.calendar_repository.save({
+            dormitory: {id: dormitory_id},
+            post_date:postDate,
+            post_link:postLink,
+            post_title: postTitle,
+        })
+    }
+}
+
+  async crawlAllDormitory({ untilYear, untilMonth, untilDate }) {
+    
+    // this.calendarUpdateDB(await this.crawlKoreaUniversityDormitory({ untilYear, untilMonth, untilDate }), 2);
+    this.calendarUpdateDB(await this.crawlNamMeoungDormitory({ untilYear, untilMonth, untilDate }),4);
+    // this.calendarUpdateDB(await this.crawlGumiHakSukDormitory({ untilYear, untilMonth, untilDate }), 3);
+
+  }
 }

@@ -13,6 +13,7 @@ import { AuthModule } from './apis/auth/auth.module';
 import { UserModule } from './apis/user/user.module';
 import { UpModule } from './apis/up/up.module';
 import * as Joi from 'joi';
+import { CalendarModule } from './apis/calendar/calendar.module';
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import * as Joi from 'joi';
     AuthModule,
     UserModule,
     UpModule,
+    CalendarModule,
   ],
 })
 export class AppModule {}

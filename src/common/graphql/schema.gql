@@ -268,6 +268,25 @@ type FetchMainSpotsOutput {
   main_spot_location: Main_spot_locationOutput!
 }
 
+type Dormitory {
+  id: Int!
+  name: String!
+  board_url: String!
+}
+
+type Calendar {
+  id: Int!
+  post_title: String
+  post_date: DateTime
+  post_link: String
+  dormitory: Dormitory
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type FetchUpOutput {
   id: Int
   board_date: Float
@@ -287,6 +306,7 @@ type Query {
   fetchMyWishHouses: [FetchMyWishHousesOutput!]!
   fetchCrawledHouses: [FetchCrawledHousesOutput!]!
   fetchImgsByHouse(houseId: Float!): [House_img!]!
+  fetchCalendar(month: Float!, dormitory_id: Float!): [Calendar!]!
 }
 
 input House_locationInput {
@@ -303,6 +323,7 @@ type Mutation {
   crawlKoreaDormitory(untilYear: Float!, untilMonth: Float!, untilDate: Float!): String!
   crawlGumiHakSukDormitory(untilYear: Float!, untilMonth: Float!, untilDate: Float!): String!
   crawlNamMeoungDormitory(untilYear: Float!, untilMonth: Float!, untilDate: Float!): String!
+  crawlAllDormitory(untilYear: Float!, untilMonth: Float!, untilDate: Float!): String!
   fetchUp(house_id: Float!): FetchUpOutput!
 }
 
