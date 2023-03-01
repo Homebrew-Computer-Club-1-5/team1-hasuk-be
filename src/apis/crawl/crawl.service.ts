@@ -297,13 +297,18 @@ export class CrawlService {
         const postTitle = result[i].postTitle;
         const postDate = result[i].postDate;
         const postLink = result[i].postLink;
+
+        const hasPost = await this.calendar_repository.find({where: {post_link:postLink}});
+
+        if(hasPost.length == 0){
+          await this.calendar_repository.save({
+              dormitory: {id: dormitory_id},
+              post_date:postDate,
+              post_link:postLink,
+              post_title: postTitle,
+          } )
+        }
         
-        await this.calendar_repository.save({
-            dormitory: {id: dormitory_id},
-            post_date:postDate,
-            post_link:postLink,
-            post_title: postTitle,
-        })
     }
 }
 
