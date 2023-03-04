@@ -25,5 +25,6 @@ export async function crawlKoreaUniversityDormitory({
   const results = await getResults({
     posts: sortedPosts,
   });
+  await browser.close();
   return results as any;
 }

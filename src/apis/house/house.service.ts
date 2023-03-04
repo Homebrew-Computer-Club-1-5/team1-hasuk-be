@@ -1,6 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { ConnectionIsNotSetError, DataSource, In, IsNull, Not, Repository } from 'typeorm';
+import {
+  ConnectionIsNotSetError,
+  DataSource,
+  In,
+  IsNull,
+  Not,
+  Repository,
+} from 'typeorm';
 import { House } from '../../db_entity/house/entities/house.entity';
 import { House_cost } from '../../db_entity/house_cost/entities/house_cost.entity';
 import { House_location } from '../../db_entity/house_location/entities/house_location.entity';
@@ -46,45 +53,43 @@ export class HouseService {
     return result;
   }
 
-  async findAllHouses({reqUser=null}) {
+  async findAllHouses({ reqUser = null }) {
     let userResult;
-    if(reqUser){
+    if (reqUser) {
       const { user_auth_id, auth_method } = reqUser;
       userResult = await this.userRepository.findOne({
         where: { user_auth_id: user_auth_id, auth_method: auth_method },
       });
-    }else{
-      userResult = {id : 0};
+    } else {
+      userResult = { id: 0 };
     }
 
     const result = await this.houseRepository.find({
       relations: ['region', 'house_cost', 'imgs', 'house_category'],
     });
-    
+
     const result2 = result.map(async (each) => {
       each.board_date = parseInt(each.board_date as any);
       let isWish = await this.houseRepository.findOne({
-        where: {id: each.id, wish_users: {id : userResult.id}},
-        relations:[
-          'wish_users',
-        ]
-      })
-      let wishVal = (isWish ? 1 : 0);
+        where: { id: each.id, wish_users: { id: userResult.id } },
+        relations: ['wish_users'],
+      });
+      let wishVal = isWish ? 1 : 0;
 
-      return {...each, is_wished: wishVal};
+      return { ...each, is_wished: wishVal };
     });
     return result2;
   }
 
   async findAllHousesByRegion({ region_id, reqUser = null }) {
     let userResult;
-    if(reqUser){
+    if (reqUser) {
       const { user_auth_id, auth_method } = reqUser;
       userResult = await this.userRepository.findOne({
         where: { user_auth_id: user_auth_id, auth_method: auth_method },
       });
-    }else{
-      userResult = {id : null};
+    } else {
+      userResult = { id: null };
     }
 
     let builder = await this.houseRepository.query(
@@ -100,20 +105,20 @@ export class HouseService {
     return builder;
   }
 
-  async findHouse({ house_id, reqUser = null}) {
+  async findHouse({ house_id, reqUser = null }) {
     let userResult;
     let wishVal;
-    if(reqUser){
+    if (reqUser) {
       const { user_auth_id, auth_method } = reqUser;
       userResult = await this.userRepository.findOne({
         where: { user_auth_id: user_auth_id, auth_method: auth_method },
       });
-    }else{
-      userResult = {id:0};
+    } else {
+      userResult = { id: 0 };
     }
 
     let result = await this.houseRepository.findOne({
-      where: { id: house_id},
+      where: { id: house_id },
       relations: [
         'house_location',
         'house_cost',
@@ -124,14 +129,12 @@ export class HouseService {
     });
 
     let isWish = await this.houseRepository.findOne({
-      where: {id: house_id, wish_users: {id : userResult.id}},
-      relations:[
-        'wish_users',
-      ]
-    })
+      where: { id: house_id, wish_users: { id: userResult.id } },
+      relations: ['wish_users'],
+    });
 
-    wishVal = (isWish ? 1 : 0);
-    
+    wishVal = isWish ? 1 : 0;
+
     if (result.is_crolled) {
       return {
         id: result.id,
@@ -143,8 +146,8 @@ export class HouseService {
         imgs: result.imgs,
         board_date: result.board_date,
         house_location: {
-          latitude: 123.567,
-          longitude: 123.567,
+          latitude: 0,
+          longitude: 0,
         },
         house_cost: {
           month_cost: 123,
@@ -158,10 +161,10 @@ export class HouseService {
         region: {
           id: 123,
         },
-        is_wished : wishVal,
+        is_wished: wishVal,
       };
     } else {
-      return {...result, is_wished : wishVal};
+      return { ...result, is_wished: wishVal };
     }
   }
 
@@ -329,16 +332,28 @@ export class HouseService {
       });
       house_etcResults.push({
         id: house_id,
-        region: (houseResult.region? houseResult.region.id : null),
+        region: houseResult.region ? houseResult.region.id : null,
         cost: {
-          month_cost: (houseResult.house_cost? houseResult.house_cost.month_cost : null),
-          deposit: (houseResult.house_cost? houseResult.house_cost.deposit : null),
-          other_info: (houseResult.house_cost? houseResult.house_cost.other_info : null),
+          month_cost: houseResult.house_cost
+            ? houseResult.house_cost.month_cost
+            : null,
+          deposit: houseResult.house_cost
+            ? houseResult.house_cost.deposit
+            : null,
+          other_info: houseResult.house_cost
+            ? houseResult.house_cost.other_info
+            : null,
         },
-        house_category: (houseResult.house_category? houseResult.house_category.id : null),
+        house_category: houseResult.house_category
+          ? houseResult.house_category.id
+          : null,
         house_location: {
-          latitude: (houseResult.house_location? houseResult.house_location.latitude : null),
-          longitude: (houseResult.house_location? houseResult.house_location.longitude : null),
+          latitude: houseResult.house_location
+            ? houseResult.house_location.latitude
+            : null,
+          longitude: houseResult.house_location
+            ? houseResult.house_location.longitude
+            : null,
         },
       });
     }
@@ -605,7 +620,7 @@ export class HouseService {
       keyFilename: 'board-373207-a02f17b5865d.json',
     }).bucket(process.env.GOOGLE_IMAGE_STORAGE);
     const result4 = await this.house_imgRepository.find({
-      where: { house: { id: house_id }, img_url: Not(In(rest.googleLinks))},
+      where: { house: { id: house_id }, img_url: Not(In(rest.googleLinks)) },
       relations: ['house'],
     });
 
@@ -683,36 +698,37 @@ export class HouseService {
     return result2;
   }
 
-  async updateWishHouse({house_id, reqUser}){
+  async updateWishHouse({ house_id, reqUser }) {
     const { user_auth_id, auth_method } = reqUser;
-    
+
     const userResult = await this.userRepository.findOne({
       where: { user_auth_id: user_auth_id, auth_method: auth_method },
     });
 
-    
     let isWish = await this.houseRepository.findOne({
-      where: {id: house_id, wish_users: {id : userResult.id}},
-      relations:[
-        'wish_users'
-      ],
+      where: { id: house_id, wish_users: { id: userResult.id } },
+      relations: ['wish_users'],
     });
     let houseResult = await this.houseRepository.findOne({
-      where: {id: house_id},
-      relations:[
-        'wish_users'
-      ],
+      where: { id: house_id },
+      relations: ['wish_users'],
     });
-  
-    if(isWish){//찜해제
+
+    if (isWish) {
+      //찜해제
       this.houseRepository.save({
-        id : house_id,
-        wish_users : (houseResult.wish_users.filter((element) => element.id !== userResult.id))
-      })
-    }else{//찜하기
+        id: house_id,
+        wish_users: houseResult.wish_users.filter(
+          (element) => element.id !== userResult.id,
+        ),
+      });
+    } else {
+      //찜하기
       this.houseRepository.save({
-        id : house_id,
-        wish_users : ((houseResult.wish_users) ? [...houseResult.wish_users, userResult] : [userResult])
+        id: house_id,
+        wish_users: houseResult.wish_users
+          ? [...houseResult.wish_users, userResult]
+          : [userResult],
       });
     }
     return 1;
