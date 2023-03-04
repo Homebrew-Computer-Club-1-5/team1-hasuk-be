@@ -321,8 +321,6 @@ type Mutation {
   updateWishHouse(house_id: Float!): Int!
   crawlKoreaPas: String!
   crawlKoreaDormitory(untilYear: Float!, untilMonth: Float!, untilDate: Float!): String!
-  crawlGumiHakSukDormitory(untilYear: Float!, untilMonth: Float!, untilDate: Float!): String!
-  crawlNamMeoungDormitory(untilYear: Float!, untilMonth: Float!, untilDate: Float!): String!
   crawlAllDormitory(untilYear: Float!, untilMonth: Float!, untilDate: Float!): String!
   fetchUp(house_id: Float!): FetchUpOutput!
 }

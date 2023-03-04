@@ -308,15 +308,26 @@ export class CrawlService {
               post_title: postTitle,
           } )
         }
-        
     }
-}
+  }
 
   async crawlAllDormitory({ untilYear, untilMonth, untilDate }) {
-    
-    // this.calendarUpdateDB(await this.crawlKoreaUniversityDormitory({ untilYear, untilMonth, untilDate }), 2);
-    this.calendarUpdateDB(await this.crawlNamMeoungDormitory({ untilYear, untilMonth, untilDate }),4);
-    // this.calendarUpdateDB(await this.crawlGumiHakSukDormitory({ untilYear, untilMonth, untilDate }), 3);
-
+    this.calendarUpdateDB(
+      await this.crawlKoreaUniversityDormitory({
+        untilYear,
+        untilMonth,
+        untilDate,
+      }),
+      2,
+    );
+    this.calendarUpdateDB(
+      await this.crawlNamMeoungDormitory({ untilYear, untilMonth, untilDate }),
+      4,
+    );
+    this.calendarUpdateDB(
+      await this.crawlGumiHakSukDormitory({ untilYear, untilMonth, untilDate }),
+      3,
+    );
+    return 'complete!!';
   }
 }

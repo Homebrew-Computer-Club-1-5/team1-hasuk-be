@@ -23,6 +23,6 @@ export async function crawlNamMeoungDormitory({ crawlUntil }) {
   const results = await getResults({
     posts: sortedPosts,
   });
-  console.log(results, 'ddd');
+  await browser.close();
   return results as any;
 }

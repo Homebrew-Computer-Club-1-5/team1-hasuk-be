@@ -25,5 +25,6 @@ export async function crawlGumiHakSukDormitory({
   const results = await getResults({
     posts: sortedPosts,
   });
+  await browser.close();
   return results as any;
 }
