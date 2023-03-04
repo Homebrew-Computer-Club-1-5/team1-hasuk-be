@@ -291,27 +291,38 @@ export class CrawlService {
 
   //
 
-  async calendarUpdateDB(result, dormitory_id){
-    
-    for(let i = 0; i< result.length; i++){
-        const postTitle = result[i].postTitle;
-        const postDate = result[i].postDate;
-        const postLink = result[i].postLink;
-        
-        await this.calendar_repository.save({
-            dormitory: {id: dormitory_id},
-            post_date:postDate,
-            post_link:postLink,
-            post_title: postTitle,
-        })
+  async calendarUpdateDB(result, dormitory_id) {
+    for (let i = 0; i < result.length; i++) {
+      const postTitle = result[i].postTitle;
+      const postDate = result[i].postDate;
+      const postLink = result[i].postLink;
+
+      await this.calendar_repository.save({
+        dormitory: { id: dormitory_id },
+        post_date: postDate,
+        post_link: postLink,
+        post_title: postTitle,
+      });
     }
-}
+  }
 
   async crawlAllDormitory({ untilYear, untilMonth, untilDate }) {
-    
-    // this.calendarUpdateDB(await this.crawlKoreaUniversityDormitory({ untilYear, untilMonth, untilDate }), 2);
-    this.calendarUpdateDB(await this.crawlNamMeoungDormitory({ untilYear, untilMonth, untilDate }),4);
-    // this.calendarUpdateDB(await this.crawlGumiHakSukDormitory({ untilYear, untilMonth, untilDate }), 3);
-
+    this.calendarUpdateDB(
+      await this.crawlKoreaUniversityDormitory({
+        untilYear,
+        untilMonth,
+        untilDate,
+      }),
+      2,
+    );
+    this.calendarUpdateDB(
+      await this.crawlNamMeoungDormitory({ untilYear, untilMonth, untilDate }),
+      4,
+    );
+    this.calendarUpdateDB(
+      await this.crawlGumiHakSukDormitory({ untilYear, untilMonth, untilDate }),
+      3,
+    );
+    return 'complete!!';
   }
 }

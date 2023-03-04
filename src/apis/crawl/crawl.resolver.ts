@@ -23,32 +23,6 @@ export class CrawlResolver {
   }
 
   @Mutation(() => String)
-  async crawlGumiHakSukDormitory(
-    @Args('untilYear') untilYear: number,
-    @Args('untilMonth') untilMonth: number,
-    @Args('untilDate') untilDate: number,
-  ) {
-    return await this.crawlService.crawlGumiHakSukDormitory({
-      untilYear,
-      untilMonth,
-      untilDate,
-    });
-  }
-
-  @Mutation(() => String)
-  async crawlNamMeoungDormitory(
-    @Args('untilYear') untilYear: number,
-    @Args('untilMonth') untilMonth: number,
-    @Args('untilDate') untilDate: number,
-  ) {
-    return await this.crawlService.crawlNamMeoungDormitory({
-      untilYear,
-      untilMonth,
-      untilDate,
-    });
-  }
-
-  @Mutation(() => String)
   async crawlAllDormitory(
     @Args('untilYear') untilYear: number,
     @Args('untilMonth') untilMonth: number,
@@ -60,6 +34,4 @@ export class CrawlResolver {
       untilDate,
     });
   }
-
-
 }

@@ -17,12 +17,12 @@ export async function getResults({ posts }) {
     const postDate = stringToDateObject(boardDateString);
 
     const postTitle = await postHandleElement.$eval(
-      'td.postTitle > a',
+      'td.title > a',
       (element) => element.textContent,
     );
 
     const postLink = await postHandleElement.$eval(
-      'td.postTitle > a',
+      'td.title > a',
       (element) => element.href,
     );
     result.push({ postTitle, postDate, postLink });
